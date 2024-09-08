@@ -3,9 +3,9 @@ from rest_framework import generics
 from .models import Doctor
 from addresses.models import Address
 from .serializers import DoctorSerializer
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views import View
 
 
@@ -51,3 +51,22 @@ class DoctorListView(ListView):
     model = Doctor
     template_name = 'doctor_list.html'  # The template that will render the list
     context_object_name = 'doctors'  # The name to access the list in the template
+
+
+class DoctorDetailView(DetailView):
+    model = Doctor
+    template_name = 'doctor_detail.html'
+    context_object_name = 'doctor'
+
+
+class DoctorUpdateView(UpdateView):
+    model = Doctor
+    fields = ['first_name', 'last_name', 'specialty', 'phone_number', 'email', 'license_number']  # Add other fields as needed
+    template_name = 'doctor_update_form.html'
+    success_url = '/doctors/list'  # Redirect to the doctor list or detail after successful update
+
+
+class DoctorDeleteView(DeleteView):
+    model = Doctor
+    template_name = 'doctor_confirm_delete.html'  # Create this template for delete confirmation
+    success_url = reverse_lazy('doctor-list')  # Redirect to doctor list after successful deletion
