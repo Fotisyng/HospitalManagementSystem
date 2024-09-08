@@ -1,6 +1,7 @@
 from django.db import models
 from addresses.models import Address
 from emergency_contacts.models import EmergencyContact
+from insurances.models import Insurance
 
 
 class Patient(models.Model):
@@ -26,12 +27,15 @@ class Patient(models.Model):
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField()
-    start_prescription_date = models.DateField(null=True, blank=True)
-    end_prescription_date = models.DateField(null=True, blank=True)
-    emergency_contact = models.OneToOneField(EmergencyContact, on_delete=models.CASCADE, null=True, blank=True, related_name='patient_contact')
+    emergency_contact = models.OneToOneField(
+        EmergencyContact,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='patient_contact'
+    )
     medical_history = models.TextField(blank=True, null=True)
-    insurance_provider = models.CharField(max_length=100, blank=True, null=True)
-    insurance_policy_number = models.CharField(max_length=50, blank=True, null=True)
+    insurance_provider = models.OneToOneField(Insurance, on_delete=models.CASCADE, related_name='insurance')
     last_visit_date = models.DateField(null=True, blank=True)
     primary_care_physician = models.CharField(max_length=100, blank=True, null=True)
     allergies = models.TextField(blank=True, null=True)
