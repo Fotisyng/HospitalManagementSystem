@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 
     # Your apps
     'patients',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'addresses',
     'insurances',
     'prescriptions',
+    'doctors',
 ]
 
 MIDDLEWARE = [

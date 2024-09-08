@@ -37,7 +37,6 @@ class Patient(models.Model):
     medical_history = models.TextField(blank=True, null=True)
     insurance_provider = models.OneToOneField(Insurance, on_delete=models.CASCADE, related_name='insurance')
     last_visit_date = models.DateField(null=True, blank=True)
-    primary_care_physician = models.CharField(max_length=100, blank=True, null=True)
     allergies = models.TextField(blank=True, null=True)
     registration_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
