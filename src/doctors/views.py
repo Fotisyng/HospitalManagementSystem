@@ -3,6 +3,7 @@ from rest_framework import generics
 from .models import Doctor
 from addresses.models import Address
 from .serializers import DoctorSerializer
+from django.views.generic import ListView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import View
@@ -44,3 +45,9 @@ class DoctorCreateFormView(generics.GenericAPIView):
             serializer.save()
             return render(request, 'doctor_form.html', {'success': 'Doctor created successfully!'})
         return render(request, 'doctor_form.html', {'errors': serializer.errors})
+
+
+class DoctorListView(ListView):
+    model = Doctor
+    template_name = 'doctor_list.html'  # The template that will render the list
+    context_object_name = 'doctors'  # The name to access the list in the template

@@ -1,0 +1,51 @@
+/* General adjustments for the card layout */
+.card {
+    border: none; /* Remove default card border */
+    border-radius: 12px; /* Rounded corners for a more modern look */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.card:hover {
+    transform: translateY(-10px); /* Slight lift on hover */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+/* Custom styles for the card header */
+.card-title {
+    font-weight: bold;
+    font-size: 1.25rem; /* Increase font size */
+    color: #007bff; /* Use a bold, noticeable color */
+}
+
+/* Card subtitle for specialty */
+.card-subtitle {
+    font-style: italic;
+    color: #6c757d; /* Subtle gray tone */
+}
+
+/* Card footer button */
+.card-footer {
+    background-color: #f8f9fa; /* Light background */
+    border-top: none; /* Remove border from the footer */
+}
+
+.card-footer .btn {
+    background-color: #007bff; /* Bright, noticeable button color */
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 50px; /* Pill-shaped button */
+    font-weight: bold;
+    border: none;
+}
+
+.card-footer .btn:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+    color: #fff; /* Keep text white */
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .card {
+        margin-bottom: 20px; /* Add more space between cards on small screens */
+    }
+}
