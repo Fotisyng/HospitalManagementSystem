@@ -7,47 +7,7 @@
     <title>{% block title %}Hospital Management System{% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'css/doctor_form.css' %}">
-    {% block extra_css %}
-    <style>
-        /* Custom Navbar Colors */
-        .navbar {
-            background-color: #4a90e2; /* Darker blue */
-        }
-        .navbar-brand {
-            color: #ffffff !important; /* White text for brand */
-        }
-        .nav-link {
-            color: #ffffff !important; /* White text for links */
-        }
-        .nav-link:hover {
-            color: #ffcc00 !important; /* Yellow color on hover */
-        }
-
-        /* Custom Dropdown Colors */
-        .dropdown-menu {
-            background-color: #ffffff; /* White background for dropdown */
-            border: 1px solid #e1e1e1; /* Light gray border */
-        }
-        .dropdown-item {
-            color: #333333; /* Dark text for items */
-        }
-        .dropdown-item:hover {
-            background-color: #f1f1f1; /* Light gray background on hover */
-            color: #007bff; /* Blue text on hover */
-        }
-
-        /* Custom Button Colors */
-        .btn-primary {
-            background-color: #ff6600; /* Orange background */
-            border-color: #ff6600; /* Orange border */
-        }
-        .btn-primary:hover {
-            background-color: #e65c00; /* Darker orange background on hover */
-            border-color: #e65c00; /* Darker orange border */
-        }
-    </style>
-    {% endblock %}
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">

@@ -2,16 +2,25 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ValidationError
 from rest_framework import generics
 from .models import Doctor
-from addresses.models import Address
+from addresses.models import Address, Country
 from .serializers import DoctorSerializer
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.db import transaction
+
 
 
 class DoctorCreateFormView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
+        # Fetch countries from the database
+        countries = Country.objects.all().order_by('name')
+
         # Render a form template
-        return render(request, 'doctor_form.html')
+        context = {
+            'specialty_choices': Doctor.SPECIALTY_CHOICES,
+            'countries': countries  # Pass countries to the template
+        }
+        return render(request, 'doctor_form.html', context)
 
     def post(self, request, *args, **kwargs):
         # Extract address data
@@ -23,16 +32,6 @@ class DoctorCreateFormView(generics.GenericAPIView):
             'street_address': request.POST.get('street_address'),
         }
 
-        # Create Address instance
-        address = Address.objects.create(**address_data)
-
-        # Validate and clean the address instance
-        try:
-            address.full_clean()  # This will trigger the clean() method, validating the country
-            address.save()  # Only save if it's valid
-        except ValidationError as e:
-            return render(request, 'doctor_form.html', {'errors': e.message_dict})
-
         # Extract doctor data and add address instance
         doctor_data = {
             'first_name': request.POST.get('first_name'),
@@ -40,17 +39,35 @@ class DoctorCreateFormView(generics.GenericAPIView):
             'specialty': request.POST.get('specialty'),
             'phone_number': request.POST.get('phone_number'),
             'email': request.POST.get('email'),
-            'address': address.pk,  # Use the primary key here
             'license_number': request.POST.get('license_number'),
-            # Handle patients if applicable
             'patients': request.POST.getlist('patients')
         }
 
-        serializer = DoctorSerializer(data=doctor_data)
-        if serializer.is_valid():
-            serializer.save()
-            return render(request, 'doctor_form.html', {'success': 'Doctor created successfully!'})
-        return render(request, 'doctor_form.html', {'errors': serializer.errors})
+        try:
+            with transaction.atomic():
+                # Create Address instance
+                address = Address(**address_data)
+                address.full_clean()  # This will trigger the clean() method, validating the country
+                address.save()
+
+                # Add address to doctor data
+                doctor_data['address'] = address.pk
+
+                serializer = DoctorSerializer(data=doctor_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    # Render success page
+                    countries = Country.objects.all().order_by('name')
+                    return render(request, 'doctor_form.html',
+                                  {'success': 'Doctor created successfully!', 'countries': countries})
+                else:
+                    # If serializer is not valid, raise an exception to trigger rollback
+                    raise ValidationError(serializer.errors)
+
+        except ValidationError as e:
+            # Handle errors and rollback
+            countries = Country.objects.all().order_by('name')
+            return render(request, 'doctor_form.html', {'errors': e.message_dict, 'countries': countries})
 
 
 class DoctorListView(ListView):

@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 
 {% block title %}Create Doctor{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="form-container">
     <h2>Create Doctor</h2>
     <form method="post">
         {% csrf_token %}
-
+        {% block extra_css %}
+        <link rel="stylesheet" href="{% static 'doctor_form.css' %}">
+        {% endblock %}
         <div class="form-group">
             <label for="first_name">First Name:</label>
             <input type="text" name="first_name" id="first_name" class="form-control" required>
@@ -21,29 +23,12 @@
         <div class="form-group">
             <label for="specialty">Specialty:</label>
             <select name="specialty" id="specialty" class="form-control" required>
-                <option value="GP">General Practitioner</option>
-                <option value="Cardiologist">Cardiologist</option>
-                <option value="Neurologist">Neurologist</option>
-                <option value="Dermatologist">Dermatologist</option>
-                <option value="Radiologist">Radiologist</option>
-                <option value="Pediatrician">Pediatrician</option>
-                <option value="Oncologist">Oncologist</option>
-                <option value="Orthopedist">Orthopedist</option>
-                <option value="Ophthalmologist">Ophthalmologist</option>
-                <option value="Psychiatrist">Psychiatrist</option>
-                <option value="Endocrinologist">Endocrinologist</option>
-                <option value="Rheumatologist">Rheumatologist</option>
-                <option value="Gastroenterologist">Gastroenterologist</option>
-                <option value="Nephrologist">Nephrologist</option>
-                <option value="Pulmonologist">Pulmonologist</option>
-                <option value="Urologist">Urologist</option>
-                <option value="Hematologist">Hematologist</option>
-                <option value="Anesthesiologist">Anesthesiologist</option>
-                <option value="Plastic Surgeon">Plastic Surgeon</option>
-                <option value="Obstetrician">Obstetrician</option>
-                <option value="Gynecologist">Gynecologist</option>
+                {% for code, name in specialty_choices %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
             </select>
         </div>
+
 
         <div class="form-group">
             <label for="phone_number">Phone Number:</label>
@@ -62,8 +47,14 @@
 
         <h3>Address</h3>
         <div class="form-group">
+            <!-- Country dropdown -->
             <label for="country">Country:</label>
-            <input type="text" name="country" id="country" class="form-control">
+            <select name="country" id="country" class="form-control" required>
+                <option value="">Select a country</option>
+                {% for country in countries %}
+                <option value="{{ country.name }}">{{ country.name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div class="form-group">
