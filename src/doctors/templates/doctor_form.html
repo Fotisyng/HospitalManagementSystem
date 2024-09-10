@@ -18,17 +18,32 @@
             <input type="text" name="last_name" id="last_name" class="form-control" required>
         </div>
 
-    <div class="form-group">
-        <label for="specialty">Specialty:</label>
-        <select name="specialty" id="specialty" class="form-control" required>
-            <option value="" selected disabled>Select Specialty</option>
-            <option value="General Practitioner">General Practitioner</option>
-            <option value="Neurologist">Neurologist</option>
-            <option value="Dermatologist">Dermatologist</option>
-            <option value="Cardiologist">Cardiologist</option>
-            <option value="Radiology">Radiology</option>
-        </select>
-    </div>
+        <div class="form-group">
+            <label for="specialty">Specialty:</label>
+            <select name="specialty" id="specialty" class="form-control" required>
+                <option value="GP">General Practitioner</option>
+                <option value="Cardiologist">Cardiologist</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Radiologist">Radiologist</option>
+                <option value="Pediatrician">Pediatrician</option>
+                <option value="Oncologist">Oncologist</option>
+                <option value="Orthopedist">Orthopedist</option>
+                <option value="Ophthalmologist">Ophthalmologist</option>
+                <option value="Psychiatrist">Psychiatrist</option>
+                <option value="Endocrinologist">Endocrinologist</option>
+                <option value="Rheumatologist">Rheumatologist</option>
+                <option value="Gastroenterologist">Gastroenterologist</option>
+                <option value="Nephrologist">Nephrologist</option>
+                <option value="Pulmonologist">Pulmonologist</option>
+                <option value="Urologist">Urologist</option>
+                <option value="Hematologist">Hematologist</option>
+                <option value="Anesthesiologist">Anesthesiologist</option>
+                <option value="Plastic Surgeon">Plastic Surgeon</option>
+                <option value="Obstetrician">Obstetrician</option>
+                <option value="Gynecologist">Gynecologist</option>
+            </select>
+        </div>
 
         <div class="form-group">
             <label for="phone_number">Phone Number:</label>
@@ -74,15 +89,15 @@
         <button type="submit" class="btn btn-primary">Create Doctor</button>
 
         {% if errors %}
-            <div class="error-list">
-                <ul>
-                    {% for field, error_list in errors.items %}
-                        {% for error in error_list %}
-                            <li>{{ field }}: {{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
-            </div>
+        <div class="error-list">
+            <ul>
+                {% for field, error_list in errors.items %}
+                {% for error in error_list %}
+                <li>{{ field }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
         {% endif %}
     </form>
 </div>

@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ValidationError
 from rest_framework import generics
 from .models import Doctor
 from addresses.models import Address
 from .serializers import DoctorSerializer
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
-from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views import View
 
 
 class DoctorCreateFormView(generics.GenericAPIView):
@@ -26,6 +25,13 @@ class DoctorCreateFormView(generics.GenericAPIView):
 
         # Create Address instance
         address = Address.objects.create(**address_data)
+
+        # Validate and clean the address instance
+        try:
+            address.full_clean()  # This will trigger the clean() method, validating the country
+            address.save()  # Only save if it's valid
+        except ValidationError as e:
+            return render(request, 'doctor_form.html', {'errors': e.message_dict})
 
         # Extract doctor data and add address instance
         doctor_data = {

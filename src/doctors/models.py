@@ -12,7 +12,23 @@ class Doctor(models.Model):
         ('Cardiologist', 'Cardiologist'),
         ('Neurologist', 'Neurologist'),
         ('Dermatologist', 'Dermatologist'),
-        # Add more specialties as needed
+        ('Radiologist', 'Radiologist'),
+        ('Pediatrician', 'Pediatrician'),
+        ('Oncologist', 'Oncologist'),
+        ('Orthopedist', 'Orthopedist'),
+        ('Ophthalmologist', 'Ophthalmologist'),
+        ('Psychiatrist', 'Psychiatrist'),
+        ('Endocrinologist', 'Endocrinologist'),
+        ('Rheumatologist', 'Rheumatologist'),
+        ('Gastroenterologist', 'Gastroenterologist'),
+        ('Nephrologist', 'Nephrologist'),
+        ('Pulmonologist', 'Pulmonologist'),
+        ('Urologist', 'Urologist'),
+        ('Hematologist', 'Hematologist'),
+        ('Anesthesiologist', 'Anesthesiologist'),
+        ('Plastic Surgeon', 'Plastic Surgeon'),
+        ('Obstetrician', 'Obstetrician'),
+        ('Gynecologist', 'Gynecologist'),
     ]
 
     first_name = models.CharField(max_length=50)
