@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
+
+GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -86,11 +90,11 @@ WSGI_APPLICATION = 'hospitalManagementSystem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hospital',         # Replace with your database name
-        'USER': 'root',         # Replace with your MySQL username
-        'PASSWORD': '182232', # Replace with your MySQL password
-        'HOST': 'localhost',            # Or your database host
-        'PORT': '3306',                 # Default MySQL port
+        'NAME': config("DATABASE_NAME"),         # Replace with your database name
+        'USER': config("DATABASE_USER"),         # Replace with your MySQL username
+        'PASSWORD': config("DATABASE_PASSWORD"), # Replace with your MySQL password
+        'HOST': config("DATABASE_HOST"),         # Or your database host
+        'PORT': '3306',                          # Default MySQL port
     }
 }
 

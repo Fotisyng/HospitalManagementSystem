@@ -2,6 +2,7 @@ from django.db import models
 import requests
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 class Address(models.Model):
@@ -50,7 +51,7 @@ class Address(models.Model):
         except Country.DoesNotExist:
             raise ValidationError(f"Country '{self.country}' not found in the database.")
 
-        api_key = "AIzaSyA8E9O6VWywikj_Z52PZbJ0_qj71-APuN8"  # Replace with your actual API key
+        api_key = settings.GOOGLE_MAPS_API_KEY # Replace with your actual API key
         api_url = f"https://addressvalidation.googleapis.com/v1:validateAddress?key={api_key}"
 
         # Prepare the request body
