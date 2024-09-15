@@ -18,31 +18,11 @@ class Address(models.Model):
     def __str__(self):
         return f"{self.street_address}, {self.city}, {self.state}, {self.country}"
 
-    def validate_country(self):
+
+    def validate_address_with_google_maps(self):
         """
-        Validates if the provided country is valid using the REST Countries API.
-
-        Parameters:
-        self (Address): The instance of the Address model where this method is being called.
-
-        Returns:
-        None: This method does not return any value. It raises a ValidationError if the country is not valid.
-
-        Raises:
-        ValidationError: If the country is not valid or if there is an error while making the API request.
-        """
-        api_url = f"https://restcountries.com/v3.1/name/{self.country}"
-        try:
-            response = requests.get(api_url)
-            if response.status_code != 200:
-                raise ValidationError(_("Invalid country name."), code='invalid_country')
-        except requests.RequestException:
-            raise ValidationError(_("Unable to validate the country at this time."), code='api_error')
-
-
-    def validate_postal_code_with_google_maps(self):
-        """
-        Validate the postal code using Google Maps Address Validation API.
+        Validate the country, city, postal code and street address for the countries supported
+        using Google Maps Address Validation API.
         """
         # Query the Country model to get the ISO Alpha-2 code for the country name
         try:
@@ -102,8 +82,8 @@ class Address(models.Model):
         """
         Override the clean method to validate the country, city, and postal code together.
         """
-        self.validate_country()
-        self.validate_postal_code_with_google_maps()
+        if settings.ADDRESS_VALIDATION_ENABLED:
+            self.validate_address_with_google_maps()
 
 
 class Country(models.Model):
