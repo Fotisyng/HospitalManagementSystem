@@ -10,7 +10,7 @@ class EmergencyContact(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     mobile_phone_number = models.CharField(max_length=15)
     relationship = models.CharField(max_length=50, blank=True, null=True)
-    address = models.ForeignKey('addresses.Address', on_delete=models.CASCADE, null=True, blank=True)
+    address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.phone_number}"

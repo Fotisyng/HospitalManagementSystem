@@ -24,7 +24,17 @@
                     <a class="dropdown-item" href="{% url 'doctor-list' %}">List Doctors</a>
                 </div>
             </li>
-            <!-- Add more navigation items here -->
+            <!-- Patients Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="patientDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Patients
+                </a>
+                <div class="dropdown-menu" aria-labelledby="patientDropdown">
+                    <a class="dropdown-item" href="{% url 'create_patient' %}">Register Patient</a>
+                    <a class="dropdown-item" href="#">List Patients</a> <!-- You can add the URL for listing patients here -->
+                </div>
+            </li>
         </ul>
     </div>
 </nav>

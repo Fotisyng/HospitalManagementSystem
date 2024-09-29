@@ -38,7 +38,7 @@ class Doctor(models.Model):
     email = models.EmailField()
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
     license_number = models.CharField(max_length=100, unique=True)  # Unique license number for the doctor
-    patients = models.ManyToManyField(Patient, related_name='doctors', null=True)  # Many-to-many relationship
+    patients = models.ManyToManyField(Patient, related_name='doctors')  # Many-to-many relationship
 
     def __str__(self):
         return f"Dr. {self.first_name} {self.last_name} - {self.specialty}"
