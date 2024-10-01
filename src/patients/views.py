@@ -1,12 +1,16 @@
 from django.db import transaction
 from django.shortcuts import render
 from django.core.exceptions import ValidationError
+from django.urls import reverse_lazy
 from rest_framework import generics
 from doctors.models import Doctor
+from patients.models import Patient
 from addresses.models import Address, Country
 from emergency_contacts.models import EmergencyContact
 from insurances.models import Insurance
 from .serializers import PatientSerializer  # Assuming you have a serializer
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+
 
 class PatientCreateView(generics.GenericAPIView):
 
@@ -14,11 +18,15 @@ class PatientCreateView(generics.GenericAPIView):
         # Fetch countries and doctors from the database
         countries = Country.objects.all().order_by('name')
         doctors = Doctor.objects.all().order_by('last_name')
+        gender_choices = Patient.GENDER_CHOICES
+        status_choices = Patient.STATUS_CHOICES
 
         # Render a form template
         context = {
             'countries': countries,  # Pass countries to the template
-            'doctors': doctors,      # Pass doctors to the template
+            'doctors': doctors, # Pass doctors to the template
+            'gender_choices': gender_choices,
+            'status_choices': status_choices,
         }
         return render(request, 'patient_form.html', context)
 
@@ -115,3 +123,35 @@ class PatientCreateView(generics.GenericAPIView):
                 'countries': countries,
                 'doctors': doctors,
             })
+
+class PatientListView(ListView):
+    model = Patient
+    template_name = 'patient_list.html'  # The template to render the list
+    context_object_name = 'patients'  # The name to access the list in the template
+
+    def get_queryset(self):
+        status = self.request.GET.get('status', 'active')  # Default to 'active' if no status is selected
+        return Patient.objects.filter(status=status)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        status_choices = Patient.STATUS_CHOICES  # Fetch status choices from the model
+        context['status_choices'] = status_choices  # Pass status choices to the template
+        context['selected_status'] = self.request.GET.get('status', 'active')  # Pass selected status to the template
+        return context
+
+class PatientDetailView(DetailView):
+    model = Patient
+    template_name = 'patient_detail.html'
+    context_object_name = 'patient' # The name to access the list in the template
+
+class PatientUpdateView(UpdateView):
+    model = Patient
+    fields = '__all__'  # All fields will be editable
+    template_name = 'patient_update_form.html'  # The template to render the form
+    success_url = reverse_lazy('patient-list')  # Redirect to the list after successful update
+
+class PatientDeleteView(DeleteView):
+    model = Patient
+    template_name = 'patient_confirm_delete.html'  # Create this template for delete confirmation
+    success_url = reverse_lazy('patient-list')  # Redirect to list after successful deletion

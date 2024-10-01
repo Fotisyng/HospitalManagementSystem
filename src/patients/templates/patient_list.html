@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient List{% endblock %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-center mb-4">Our Patients</h2>
+
+    <!-- Filter Dropdown -->
+    <!-- Filter Dropdown -->
+<form method="get" class="mb-4">
+    <div class="form-group">
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter" name="status" class="form-control" onchange="this.form.submit()">
+            {% for code, name in status_choices %}
+            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+    <div class="row">
+        {% for patient in patients %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ patient.first_name }} {{ patient.last_name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ patient.gender }}</h6>
+                    <p class="card-text">
+                        <strong>Date of Birth:</strong> {{ patient.date_of_birth }}<br>
+                        <strong>Email:</strong> {{ patient.email }}<br>
+                        <strong>Phone:</strong> {{ patient.phone_number }}<br>
+                        <strong>Insurance:</strong> {{ patient.insurance_provider }}<br>
+                    </p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'patient-detail' patient.pk %}" class="btn btn-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No patients found for the selected status.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -58,8 +58,11 @@ class DoctorCreateFormView(generics.GenericAPIView):
                     serializer.save()
                     # Render success page
                     countries = Country.objects.all().order_by('name')
-                    return render(request, 'doctor_form.html',
-                                  {'success': 'Doctor created successfully!', 'countries': countries})
+                    context = {
+                        'specialty_choices': Doctor.SPECIALTY_CHOICES,
+                        'countries': countries  # Pass countries to the template
+                    }
+                    return render(request, 'doctor_form.html', context)
                 else:
                     # If serializer is not valid, raise an exception to trigger rollback
                     raise ValidationError(serializer.errors)
@@ -67,7 +70,12 @@ class DoctorCreateFormView(generics.GenericAPIView):
         except ValidationError as e:
             # Handle errors and rollback
             countries = Country.objects.all().order_by('name')
-            return render(request, 'doctor_form.html', {'errors': e.message_dict, 'countries': countries})
+            context = {
+                'errors': e.message_dict,
+                'specialty_choices': Doctor.SPECIALTY_CHOICES,
+                'countries': countries  # Pass countries to the template
+            }
+            return render(request, 'doctor_form.html', context)
 
 
 class DoctorListView(ListView):
