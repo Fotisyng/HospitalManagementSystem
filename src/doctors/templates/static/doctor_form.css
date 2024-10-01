@@ -1,0 +1,78 @@
+/* General Form Container Styles */
+.form-container {
+    background-color: #ffffff; /* White background for better visibility */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px; /* Limit the width */
+    margin: 0 auto; /* Center the form */
+}
+
+/* Heading Styles */
+h2 {
+    color: #292328; /* Dark Purple */
+    border-bottom: 2px solid #316e83; /* Medium Blue border */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Form Group Styles */
+.form-group {
+    margin-bottom: 15px;
+    padding: 0; /* Ensure no extra padding is causing clipping */
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Style for Select Elements */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #a8b4b2; /* Light Gray border */
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in the width */
+    height: auto; /* Ensure dropdown height adapts to content */
+    overflow: hidden; /* Prevent overflow issues */
+    background-color: #ffffff; /* Set a white background for better visibility */
+    font-size: 16px; /* Adjust font size if needed */
+    line-height: 1.5; /* Improve line height for better readability */
+}
+
+.form-control:focus {
+    border-color: #316e83; /* Medium Blue border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(49, 110, 131, 0.25); /* Optional: add shadow on focus */
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #316e83; /* Medium Blue background */
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #468590; /* Light Blue background on hover */
+}
+
+/* Error List Styles */
+.error-list {
+    color: #d9534f; /* Error color */
+    margin-top: 20px;
+}
+
+.error-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.error-list li {
+    margin-bottom: 10px;
+}

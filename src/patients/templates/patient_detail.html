@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Profile{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-center mb-4">Patient Profile</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ patient.first_name }} {{ patient.last_name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Gender: {{ patient.gender }}</h6>
+            <p class="card-text">
+                <strong>Date of Birth:</strong> {{ patient.date_of_birth }}<br>
+                <strong>Email:</strong> {{ patient.email }}<br>
+                <strong>Phone:</strong> {{ patient.phone_number }}<br>
+                <strong>Address:</strong> {{ patient.address.street_address }}, {{ patient.address.city }},
+                {{ patient.address.state }}, {{ patient.address.postal_code }}, {{ patient.address.country }}<br>
+                <strong>Insurance Provider:</strong> {{ patient.insurance_provider }}<br>
+                <strong>Insurance Policy Number:</strong> {{ patient.insurance_policy_number }}<br>
+                <strong>Last Visit Date:</strong> {{ patient.last_visit_date }}<br>
+                <strong>Primary Care Physician:</strong> {{ patient.primary_care_physician }}<br>
+                <strong>Allergies:</strong> {{ patient.allergies }}<br>
+                <strong>Medical History:</strong> {{ patient.medical_history }}<br>
+                <strong>Status:</strong> {{ patient.status }}<br>
+            </p>
+            <a href="{% url 'patient-update' patient.pk %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url 'patient-delete' patient.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
+                Delete Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
