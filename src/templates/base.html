@@ -32,7 +32,19 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="patientDropdown">
                     <a class="dropdown-item" href="{% url 'create_patient' %}">Register Patient</a>
-                    <a class="dropdown-item" href="{% url 'patient-list' %}">List Patients</a> <!-- You can add the URL for listing patients here -->
+                    <a class="dropdown-item" href="{% url 'patient-list' %}">List Patients</a>
+                    <!-- You can add the URL for listing patients here -->
+                </div>
+            </li>
+            <!-- Nurses Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="nurseDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Nurses
+                </a>
+                <div class="dropdown-menu" aria-labelledby="nurseDropdown">
+                    <a class="dropdown-item" href="{% url 'create_nurse' %}">Register Nurse</a>
+                    <a class="dropdown-item" href="{% url 'nurse-list' %}">List Nurses</a>
                 </div>
             </li>
         </ul>
