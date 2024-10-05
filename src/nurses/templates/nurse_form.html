@@ -75,7 +75,8 @@
         <!-- Supervised Nurses Dropdown -->
         <div class="form-group">
             <label for="supervised_nurse">Supervised Nurses:</label>
-            <select name="supervised_nurse" id="supervised_nurse" class="form-control" multiple>
+            <select name="supervised_nurse" id="supervised_nurse" class="form-control" required>
+                <option value="" disabled selected>Select the supervisor nurse</option>
                 {% for nurse in nurses %}
                 <option value="{{ nurse.id }}">{{ nurse.first_name }} {{ nurse.last_name }}</option>
                 {% endfor %}

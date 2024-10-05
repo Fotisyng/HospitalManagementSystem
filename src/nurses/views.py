@@ -14,7 +14,7 @@ class NurseCreateView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         # Fetch countries and any other needed related data
         countries = Country.objects.all().order_by('name')
-        nurses = Nurse.objects.all().order_by('last_name')  # Get all nurses for the dropdown
+        nurses = Nurse.objects.filter(role__in=['charge', 'chief'])
         role_choices = Nurse.ROLE_CHOICES
         department_choices = Nurse.DEPARTMENT_CHOICES
 
@@ -65,7 +65,7 @@ class NurseCreateView(generics.GenericAPIView):
         }
 
         countries = Country.objects.all().order_by('name')
-        nurses = Nurse.objects.all().order_by('last_name')  # Get all nurses for the dropdown
+        nurses = Nurse.objects.filter(role__in=['charge', 'chief'])
         role_choices = Nurse.ROLE_CHOICES
         department_choices = Nurse.DEPARTMENT_CHOICES
 
@@ -142,3 +142,8 @@ class NurseUpdateView(UpdateView):
     fields = '__all__'  # All fields will be editable
     template_name = 'nurse_update_form.html'  # The template to render the form
     success_url = reverse_lazy('nurse-list')  # Redirect to the list after successful update
+
+class NurseDeleteView(DeleteView):
+    model = Nurse
+    template_name = 'nurse_confirm_delete.html'  # Create this template for delete confirmation
+    success_url = reverse_lazy('nurse-list')  # Redirect to list after successful deletion
