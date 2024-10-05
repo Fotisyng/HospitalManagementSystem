@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Nurse Profile{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-center mb-4">Nurse Profile</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ nurse.first_name }} {{ nurse.last_name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Role: {{ nurse.role }}</h6>
+            <p class="card-text">
+                <strong>Date of Birth:</strong> {{ nurse.date_of_birth }}<br>
+                <strong>Email:</strong> {{ nurse.email }}<br>
+                <strong>Phone:</strong> {{ nurse.phone_number }}<br>
+                <strong>Address:</strong> {{ nurse.address.street_address }}, {{ nurse.address.city }},
+                {{ nurse.address.state }}, {{ nurse.address.postal_code }}, {{ nurse.address.country }}<br>
+                <strong>License Number:</strong> {{ nurse.license_number }}<br>
+                <strong>Department:</strong> {{ nurse.department }}<br>
+                <strong>Date Hired:</strong> {{ nurse.date_hired }}<br>
+                <strong>Date Ended:</strong> {{ nurse.date_ended }}<br>
+                <strong>Supervised Nurses:</strong>
+            <ul>
+                {% for supervised_nurse in nurse.supervised_nurses.all %}
+                <li>{{ supervised_nurse.first_name }} {{ supervised_nurse.last_name }}</li>
+                {% empty %}
+                <li>No supervised nurses.</li>
+                {% endfor %}
+            </ul>
+            </p>
+            <a href="{% url 'nurse-update' nurse.pk %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url 'nurse-delete' nurse.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
+                Delete Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
