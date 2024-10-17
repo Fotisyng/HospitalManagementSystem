@@ -1,131 +1,117 @@
 from django.views.generic import ListView, UpdateView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import render
-from django.core.exceptions import ValidationError
-from django.db import transaction
-from rest_framework import generics
 from .models import Nurse
-from addresses.models import Address, Country
-from emergency_contacts.models import EmergencyContact
 from .serializers import NurseSerializer
+from hospitalManagementSystem.views import BaseCreateView
+from common.utils import create_address, create_emergency_contact
 
-class NurseCreateView(generics.GenericAPIView):
 
-    def get(self, request, *args, **kwargs):
-        # Fetch countries and any other needed related data
-        countries = Country.objects.all().order_by('name')
-        nurses = Nurse.objects.filter(role__in=['charge', 'chief'])
+class NurseCreateView(BaseCreateView):
+
+    template_name = 'nurse_form.html'
+    success_message = 'Nurse registered successfully!'
+
+    def get_context_data(self):
+        """Extends the base context with additional nurse-specific context data."""
+        context = super().get_context_data()
         role_choices = Nurse.ROLE_CHOICES
+        gender_choices = Nurse.GENDER_CHOICES
         department_choices = Nurse.DEPARTMENT_CHOICES
+        head_nurses = Nurse.objects.filter(role__in=['charge', 'chief'])
 
-        # Render the form template
-        context = {
-            'countries': countries,
+        context.update({
             'role_choices': role_choices,
-            'nurses': nurses,
+            'gender_choices': gender_choices,
             'department_choices': department_choices,
-        }
-        return render(request, 'nurse_form.html', context)
+            'nurses': head_nurses,
+        })
 
-    def post(self, request, *args, **kwargs):
-        # Extract nurse data and nested related data from request
-        nurse_data = {
-            'first_name': request.POST.get('first_name'),
-            'last_name': request.POST.get('last_name'),
-            'date_of_birth': request.POST.get('date_of_birth'),
-            'phone_number': request.POST.get('phone_number'),
-            'email': request.POST.get('email'),
-            'license_number': request.POST.get('license_number'),
-            'role': request.POST.get('role'),
-            'department': request.POST.get('department'),
-            'date_hired': request.POST.get('date_hired'),
-            'status': request.POST.get('status'),
-            'supervised_nurse': request.POST.get('supervised_nurse'),
-            'address': {
-                'country': request.POST.get('country'),
-                'city': request.POST.get('city'),
-                'state': request.POST.get('state'),
-                'postal_code': request.POST.get('postal_code'),
-                'street_address': request.POST.get('street_address'),
-            },
-            'emergency_contact_address': {
-                'country': request.POST.get('emergency_contact_country'),
-                'city': request.POST.get('emergency_contact_city'),
-                'state': request.POST.get('emergency_contact_state'),
-                'postal_code': request.POST.get('emergency_contact_postal_code'),
-                'street_address': request.POST.get('emergency_contact_street_address'),
-            },
-            'emergency_contact': {
-                'name': request.POST.get('emergency_contact_name'),
-                'phone_number': request.POST.get('emergency_contact_phone'),
-                'mobile_phone_number': request.POST.get('emergency_contact_mobile_phone'),
-                'relationship': request.POST.get('emergency_contact_relationship'),
-                'address': request.POST.get('emergency_contact_address'),
+        return context
+
+
+    def create_related_models(self, data):
+        """Handles nurse-specific related model creation. The nurse address and
+        emergency_contact are also created along with the nurse object."""
+        if all(data.get(field) for field in ['country', 'city', 'postal_code']):
+            address_data = {
+                'country': data.get('country'),
+                'city': data.get('city'),
+                'state': data.get('state'),
+                'postal_code': data.get('postal_code'),
+                'street_address': data.get('street_address'),
             }
+            address = create_address(address_data)
+        else:
+            address = None
+
+        print({address})
+
+        if all(data.get(field) for field in
+               ['emergency_contact_country', 'emergency_contact_city', 'emergency_contact_postal_code']):
+            emergency_contact_address_data = {
+                'country': data.get('emergency_contact_country'),
+                'city': data.get('emergency_contact_city'),
+                'state': data.get('emergency_contact_state'),
+                'postal_code': data.get('emergency_contact_postal_code'),
+                'street_address': data.get('emergency_contact_street_address'),
+            }
+            emergency_contact_address = create_address(emergency_contact_address_data)
+        else:
+            emergency_contact_address = None
+
+        print({emergency_contact_address})
+
+        if any(data.get(field) for field in
+               ['emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_mobile_phone',
+                'emergency_contact_relationship']):
+            emergency_contact_data = {
+                'name': data.get('emergency_contact_name'),
+                'phone_number': data.get('emergency_contact_phone'),
+                'mobile_phone_number': data.get('emergency_contact_mobile_phone'),
+                'relationship': data.get('emergency_contact_relationship'),
+            }
+            emergency_contact = create_emergency_contact(emergency_contact_data, emergency_contact_address)
+        else:
+            emergency_contact = None
+
+        print({emergency_contact})
+
+        nurse_data = {
+            'first_name': data.get('first_name'),
+            'last_name': data.get('last_name'),
+            'date_of_birth': data.get('date_of_birth'),
+            'phone_number': data.get('phone_number'),
+            'email': data.get('email'),
+            'gender': data.get('gender'),
+            'license_number': data.get('license_number'),
+            'role': data.get('role'),
+            'department': data.get('department'),
+            'date_hired': data.get('date_hired'),
+            'hiring_end_date': data.get('hiring_end_date') if data.get('hiring_end_date') else None,
+            'supervisor_nurse': data.getlist('supervisor_nurse'),
+            'address': address.pk if address else None,
+            'emergency_contact': emergency_contact.pk if emergency_contact else None,
         }
+        print(nurse_data)
+        serializer = NurseSerializer(data=nurse_data)
 
-        countries = Country.objects.all().order_by('name')
-        nurses = Nurse.objects.filter(role__in=['charge', 'chief'])
-        role_choices = Nurse.ROLE_CHOICES
-        department_choices = Nurse.DEPARTMENT_CHOICES
+        if serializer.is_valid():
+            print("Validation Passed: Data is valid.")
+            nurse = serializer.save()
+            # Set supervised nurses if provided
+            supervisor_nurse = nurse_data.get('supervisor_nurse')
+            if supervisor_nurse:
+                nurse.supervisor_nurses.set(supervisor_nurse)
+            else:
+                nurse.supervisor_nurses.clear()
 
-        try:
-            with transaction.atomic():
-                # Create address, emergency contact address, and emergency contact
-                address = Address.objects.create(**nurse_data['address'])
-                emergency_contact_address = Address.objects.create(**nurse_data['emergency_contact_address'])
-                emergency_contact_data = nurse_data['emergency_contact']
-                emergency_contact_data['address'] = emergency_contact_address  # Link the address
-                emergency_contact = EmergencyContact.objects.create(**emergency_contact_data)
+            print(f"Nurse Created: {nurse}")
+        else:
+            # If validation fails, print errors
+            print("Validation Failed: Errors occurred.")
+            print(serializer.errors)  # Debugging
+            return serializer.errors
 
-                # Prepare the data for the nurse serializer
-                nurse_data['address'] = address.pk
-                nurse_data['emergency_contact'] = emergency_contact.pk
-
-                # Use the NurseSerializer to create the nurse
-                serializer = NurseSerializer(data=nurse_data)
-
-                if serializer.is_valid():
-                    nurse = serializer.save()
-                    supervised_nurses = nurse_data.get('supervised_nurse')
-
-                    if supervised_nurses:  # Only call set if there are supervised nurses provided
-                        nurse.supervised_nurses.set(supervised_nurses)
-                    else:
-                        nurse.supervised_nurses.clear()  # Optional: Clear the relation if none are provided
-                    print(f"Nurse Created: {nurse}")  # Debugging
-                    nurse.save()
-
-                    return render(request, 'nurse_form.html', {
-                        'success': 'Nurse registered successfully!',
-                        'countries': countries,
-                        'role_choices': role_choices,
-                        'nurses': nurses,
-                        'department_choices': department_choices,
-                    })
-                else:
-                    print(serializer.errors)  # Print out errors for debugging
-                    raise ValidationError(serializer.errors)
-
-        except ValidationError as e:
-            return render(request, 'nurse_form.html', {
-                'errors': e.message_dict,
-                'countries': countries,
-                'role_choices': role_choices,
-                'nurses': nurses,
-                'department_choices': department_choices,
-            })
-
-        except Exception as e:
-            import traceback
-            print(f"Exception occurred: {str(e)}")
-            print(traceback.format_exc())  # This will show the full traceback
-            return render(request, 'nurse_form.html', {
-                'errors': str(e),
-                'countries': countries,
-                'role_choices': role_choices,
-                'department_choices': department_choices,
-            })
 
 class NurseListView(ListView):
     model = Nurse

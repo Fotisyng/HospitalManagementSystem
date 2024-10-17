@@ -1,0 +1,52 @@
+<!-- emergency_contact_form.html -->
+<h2>Emergency Contact</h2>
+<div class="form-group">
+    <label for="emergency_contact_name">Emergency Contact Name:</label>
+    <input type="text" name="emergency_contact_name" id="emergency_contact_name" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_phone">Emergency Contact Phone:</label>
+    <input type="text" name="emergency_contact_phone" id="emergency_contact_phone" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_mobile_phone">Emergency Contact Mobile Phone:</label>
+    <input type="text" name="emergency_contact_mobile_phone" id="emergency_contact_mobile_phone" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_relationship">Relationship:</label>
+    <input type="text" name="emergency_contact_relationship" id="emergency_contact_relationship" class="form-control">
+</div>
+
+<h3>Emergency Contact Address</h3>
+<div class="form-group">
+    <label for="emergency_contact_country">Country:</label>
+    <select name="emergency_contact_country" id="emergency_contact_country" class="form-control">
+        <option value="">Select a country</option>
+        {% for country in countries %}
+        <option value="{{ country.name }}">{{ country.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_city">City:</label>
+    <input type="text" name="emergency_contact_city" id="emergency_contact_city" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_state">State:</label>
+    <input type="text" name="emergency_contact_state" id="emergency_contact_state" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_postal_code">Postal Code:</label>
+    <input type="text" name="emergency_contact_postal_code" id="emergency_contact_postal_code" class="form-control">
+</div>
+
+<div class="form-group">
+    <label for="emergency_contact_street_address">Street Address:</label>
+    <input type="text" name="emergency_contact_street_address" id="emergency_contact_street_address" class="form-control">
+</div>

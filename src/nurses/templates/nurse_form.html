@@ -4,20 +4,13 @@
 {% load static %}
 {% block content %}
 <div class="form-container">
-    <h2>Create Nurse</h2>
-    <form method="post">
+    <h2>Register A New Nurse</h2>
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Nurse Information -->
-        <div class="form-group">
-            <label for="first_name">First Name:</label>
-            <input type="text" name="first_name" id="first_name" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-            <label for="last_name">Last Name:</label>
-            <input type="text" name="last_name" id="last_name" class="form-control" required>
-        </div>
+        <!-- Include the common basic information fields -->
+        {% include 'basic_info_form.html' %}
 
         <div class="form-group">
             <label for="date_of_birth">Date of Birth:</label>
@@ -25,13 +18,12 @@
         </div>
 
         <div class="form-group">
-            <label for="phone_number">Phone Number:</label>
-            <input type="text" name="phone_number" id="phone_number" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" name="email" id="email" class="form-control" required>
+            <label for="gender">Gender:</label>
+            <select name="gender" id="gender" class="form-control" required>
+                {% for code, name in gender_choices %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <!-- Nurse License Information -->
@@ -68,14 +60,14 @@
 
         <!-- Hiring End Date (Optional) -->
         <div class="form-group">
-            <label for="end_date">End Date:</label>
-            <input type="date" name="end_date" id="end_date" class="form-control">
+            <label for="hiring_end_date">End Date:</label>
+            <input type="date" name="hiring_end_date" id="hiring_end_date" class="form-control">
         </div>
 
         <!-- Supervised Nurses Dropdown -->
         <div class="form-group">
-            <label for="supervised_nurse">Supervised Nurses:</label>
-            <select name="supervised_nurse" id="supervised_nurse" class="form-control" required>
+            <label for="supervisor_nurse">Supervisor Nurse:</label>
+            <select name="supervisor_nurse" id="supervisor_nurse" class="form-control">
                 <option value="" disabled selected>Select the supervisor nurse</option>
                 {% for nurse in nurses %}
                 <option value="{{ nurse.id }}">{{ nurse.first_name }} {{ nurse.last_name }}</option>
@@ -83,109 +75,32 @@
             </select>
         </div>
 
-        <!-- Nurse Address -->
+        <!-- Include the common address fields -->
         <h3>Nurse Address</h3>
-        <div class="form-group">
-            <label for="country">Country:</label>
-            <select name="country" id="country" class="form-control" required>
-                <option value="">Select a country</option>
-                {% for country in countries %}
-                <option value="{{ country.name }}">{{ country.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+        {% include 'address_form.html' with countries=countries %}
 
-        <div class="form-group">
-            <label for="city">City:</label>
-            <input type="text" name="city" id="city" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="state">State:</label>
-            <input type="text" name="state" id="state" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="postal_code">Postal Code:</label>
-            <input type="text" name="postal_code" id="postal_code" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="street_address">Street Address:</label>
-            <input type="text" name="street_address" id="street_address" class="form-control">
-        </div>
-
-        <!-- Emergency Contact -->
-        <h3>Emergency Contact</h3>
-        <div class="form-group">
-            <label for="emergency_contact_name">Emergency Contact Name:</label>
-            <input type="text" name="emergency_contact_name" id="emergency_contact_name" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_phone">Emergency Contact Phone:</label>
-            <input type="text" name="emergency_contact_phone" id="emergency_contact_phone" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_mobile_phone">Emergency Contact Mobile Phone:</label>
-            <input type="text" name="emergency_contact_mobile_phone" id="emergency_contact_mobile_phone"
-                   class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_relationship">Relationship:</label>
-            <input type="text" name="emergency_contact_relationship" id="emergency_contact_relationship"
-                   class="form-control">
-        </div>
-
-        <h3>Emergency Contact Address</h3>
-        <div class="form-group">
-            <label for="emergency_contact_country">Country:</label>
-            <select name="emergency_contact_country" id="emergency_contact_country" class="form-control" required>
-                <option value="">Select a country</option>
-                {% for country in countries %}
-                <option value="{{ country.name }}">{{ country.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_city">City:</label>
-            <input type="text" name="emergency_contact_city" id="emergency_contact_city" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_state">State:</label>
-            <input type="text" name="emergency_contact_state" id="emergency_contact_state" class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_postal_code">Postal Code:</label>
-            <input type="text" name="emergency_contact_postal_code" id="emergency_contact_postal_code"
-                   class="form-control">
-        </div>
-
-        <div class="form-group">
-            <label for="emergency_contact_street_address">Street Address:</label>
-            <input type="text" name="emergency_contact_street_address" id="emergency_contact_street_address"
-                   class="form-control">
-        </div>
+        <!-- Include the emergency contact fields -->
+        {% include 'emergency_contact_form.html' with countries=countries %}
 
         <button type="submit" class="btn btn-primary">Create Nurse</button>
 
-        <!-- Error Messages -->
-        {% if errors %}
-        <div class="error-list">
-            <ul>
-                {% for field, error_list in errors.items %}
-                {% for error in error_list %}
-                <li>{{ field }}: {{ error }}</li>
-                {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+        <!-- Error Messages (Specific to this template) -->
+{% if errors %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        {% for field, error_list in errors.items %}
+            {% for error in error_list %}
+                // Display the error message only (without 'code=invalid')
+                toastr.error("{{ error }}", "Validation Error", {
+                    "closeButton": true,
+                    "progressBar": true,
+                    "timeOut": "5000"
+                });
+            {% endfor %}
+        {% endfor %}
+    });
+</script>
+{% endif %}
     </form>
 </div>
 {% endblock %}
