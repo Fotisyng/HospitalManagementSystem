@@ -88,15 +88,13 @@
 {% if errors %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        {% for field, error_list in errors.items %}
-            {% for error in error_list %}
-                // Display the error message only (without 'code=invalid')
-                toastr.error("{{ error }}", "Validation Error", {
-                    "closeButton": true,
-                    "progressBar": true,
-                    "timeOut": "5000"
-                });
-            {% endfor %}
+        {% for error in errors %}
+            // Display the error message only
+            toastr.error("{{ error }}", "Validation Error", {
+                "closeButton": true,
+                "progressBar": true,
+                "timeOut": "5000"
+            });
         {% endfor %}
     });
 </script>

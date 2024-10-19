@@ -4,6 +4,7 @@ from .models import Nurse
 from .serializers import NurseSerializer
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address, create_emergency_contact
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 class NurseCreateView(BaseCreateView):
@@ -32,35 +33,43 @@ class NurseCreateView(BaseCreateView):
     def create_related_models(self, data):
         """Handles nurse-specific related model creation. The nurse address and
         emergency_contact are also created along with the nurse object."""
-        if all(data.get(field) for field in ['country', 'city', 'postal_code']):
-            address_data = {
-                'country': data.get('country'),
-                'city': data.get('city'),
-                'state': data.get('state'),
-                'postal_code': data.get('postal_code'),
-                'street_address': data.get('street_address'),
-            }
-            address = create_address(address_data)
-        else:
-            address = None
+        errors = {}
+        address = None
+        try:
+            if all(data.get(field) for field in ['country', 'city', 'postal_code']):
+                address_data = {
+                    'country': data.get('country'),
+                    'city': data.get('city'),
+                    'state': data.get('state'),
+                    'postal_code': data.get('postal_code'),
+                    'street_address': data.get('street_address'),
+                }
+                address = create_address(address_data)
+            else:
+                address = None
+        except DjangoValidationError as e:
+            errors['address'] = {'messages': [str(error) for error in e.error_list]}  # or str(e) if you prefer a string format
+        # Create Address for the emergency contact
+        emergency_contact_address = None
+        try:
+            if all(data.get(field) for field in
+                   ['emergency_contact_country', 'emergency_contact_city', 'emergency_contact_postal_code']):
+                emergency_contact_address_data = {
+                    'country': data.get('emergency_contact_country'),
+                    'city': data.get('emergency_contact_city'),
+                    'state': data.get('emergency_contact_state'),
+                    'postal_code': data.get('emergency_contact_postal_code'),
+                    'street_address': data.get('emergency_contact_street_address'),
+                }
+                emergency_contact_address = create_address(emergency_contact_address_data)
+            else:
+                emergency_contact_address = None
+        except DjangoValidationError as e:
+            # If emergency contact address validation fails, store the error
+            errors['emergency_contact_address'] = {'messages': [str(error) for error in e.error_list]}
 
-        print({address})
-
-        if all(data.get(field) for field in
-               ['emergency_contact_country', 'emergency_contact_city', 'emergency_contact_postal_code']):
-            emergency_contact_address_data = {
-                'country': data.get('emergency_contact_country'),
-                'city': data.get('emergency_contact_city'),
-                'state': data.get('emergency_contact_state'),
-                'postal_code': data.get('emergency_contact_postal_code'),
-                'street_address': data.get('emergency_contact_street_address'),
-            }
-            emergency_contact_address = create_address(emergency_contact_address_data)
-        else:
-            emergency_contact_address = None
-
-        print({emergency_contact_address})
-
+        # Create Emergency Contact
+        emergency_contact = None
         if any(data.get(field) for field in
                ['emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_mobile_phone',
                 'emergency_contact_relationship']):
@@ -70,9 +79,11 @@ class NurseCreateView(BaseCreateView):
                 'mobile_phone_number': data.get('emergency_contact_mobile_phone'),
                 'relationship': data.get('emergency_contact_relationship'),
             }
-            emergency_contact = create_emergency_contact(emergency_contact_data, emergency_contact_address)
-        else:
-            emergency_contact = None
+            try:
+                emergency_contact = create_emergency_contact(emergency_contact_data, emergency_contact_address)
+            except DjangoValidationError as e:
+                # If emergency contact validation fails, store the error
+                errors['emergency_contact'] = {'messages': [str(error) for error in e.error_list]}
 
         print({emergency_contact})
 
@@ -109,8 +120,11 @@ class NurseCreateView(BaseCreateView):
         else:
             # If validation fails, print errors
             print("Validation Failed: Errors occurred.")
-            print(serializer.errors)  # Debugging
-            return serializer.errors
+            print(serializer.errors)
+            errors['nurse'] = serializer.errors
+        print("The errors are:")
+        print(errors)
+        return errors
 
 
 class NurseListView(ListView):

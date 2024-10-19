@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+   "copy-static": "npm run copy-bootstrap && npm run copy-jquery && npm run copy-toastr",
+    "copy-bootstrap": "shx mkdir -p src/static/bootstrap/css && shx mkdir -p src/static/bootstrap/js && shx cp -u node_modules/bootstrap/dist/css/bootstrap.min.css src/static/bootstrap/css/ && shx cp -u node_modules/bootstrap/dist/js/bootstrap.bundle.min.js src/static/bootstrap/js/",
+    "copy-jquery": "shx mkdir -p src/static/jquery && shx cp -u node_modules/jquery/dist/jquery.min.js src/static/jquery/",
+    "copy-toastr": "shx mkdir -p src/static/toastr && shx cp -u node_modules/toastr/build/toastr.min.css src/static/toastr/ && shx cp -u node_modules/toastr/build/toastr.min.js src/static/toastr/"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +17,8 @@
     "bootstrap": "^5.3.3",
     "jquery": "^3.7.1",
     "toastr": "^2.1.4"
+  },
+  "devDependencies": {
+    "shx": "^0.3.4"
   }
 }
