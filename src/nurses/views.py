@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 class NurseCreateView(BaseCreateView):
-
     template_name = 'nurse_form.html'
     success_message = 'Nurse registered successfully!'
 
@@ -29,7 +28,6 @@ class NurseCreateView(BaseCreateView):
 
         return context
 
-
     def create_related_models(self, data):
         """Handles nurse-specific related model creation. The nurse address and
         emergency_contact are also created along with the nurse object."""
@@ -48,7 +46,8 @@ class NurseCreateView(BaseCreateView):
             else:
                 address = None
         except DjangoValidationError as e:
-            errors['address'] = {'messages': [str(error) for error in e.error_list]}  # or str(e) if you prefer a string format
+            errors['address'] = {
+                'messages': [str(error) for error in e.error_list]}  # or str(e) if you prefer a string format
         # Create Address for the emergency contact
         emergency_contact_address = None
         try:
@@ -71,12 +70,17 @@ class NurseCreateView(BaseCreateView):
         # Create Emergency Contact
         emergency_contact = None
         if any(data.get(field) for field in
-               ['emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_mobile_phone',
-                'emergency_contact_relationship']):
+               ['emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_phone_number',
+                'emergency_contact_relationship', 'emergency_contact_secondary_phone_number',
+                'emergency_contact_date_of_birth', 'emergency_contact_gender', 'emergency_contact_email']):
             emergency_contact_data = {
-                'name': data.get('emergency_contact_name'),
-                'phone_number': data.get('emergency_contact_phone'),
-                'mobile_phone_number': data.get('emergency_contact_mobile_phone'),
+                'first_name': data.get('emergency_contact_first_name'),
+                'last_name': data.get('emergency_contact_last_name'),
+                'email': data.get('emergency_contact_email'),
+                'date_of_birth': data.get('emergency_contact_date_of_birth'),
+                'gender': data.get('emergency_contact_gender'),
+                'phone_number': data.get('emergency_contact_phone_number'),
+                'secondary_phone_number': data.get('emergency_contact_secondary_phone_number'),
                 'relationship': data.get('emergency_contact_relationship'),
             }
             try:
@@ -132,16 +136,19 @@ class NurseListView(ListView):
     template_name = 'nurse_list.html'  # Create this template
     context_object_name = 'nurses'  # The name to access the list in the template
 
+
 class NurseDetailView(DetailView):
     model = Nurse
     template_name = 'nurse_detail.html'
     context_object_name = 'nurse'  # The name to access the list in the template
+
 
 class NurseUpdateView(UpdateView):
     model = Nurse
     fields = '__all__'  # All fields will be editable
     template_name = 'nurse_update_form.html'  # The template to render the form
     success_url = reverse_lazy('nurse-list')  # Redirect to the list after successful update
+
 
 class NurseDeleteView(DeleteView):
     model = Nurse
