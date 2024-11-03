@@ -72,7 +72,7 @@ class PatientCreateView(BaseCreateView):
 
         # Create Emergency Contact
         emergency_contact = None
-        if any(data.get(field) for field in
+        if all(data.get(field) for field in
                ['emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_phone_number',
                 'emergency_contact_relationship', 'emergency_contact_secondary_phone_number',
                 'emergency_contact_date_of_birth', 'emergency_contact_gender', 'emergency_contact_email']):
@@ -102,6 +102,7 @@ class PatientCreateView(BaseCreateView):
         }
 
         insurance = Insurance.objects.create(**insurance_provider)
+        doctors = [int(doctor) for doctor in data.getlist('doctor') if doctor.isdigit()]
 
         # Now create the patient using the patient data
         patient_data = {
@@ -112,10 +113,10 @@ class PatientCreateView(BaseCreateView):
             'phone_number': data.get('phone_number'),
             'email': data.get('email'),
             'status': data.get('status'),
-            'address': address.pk,
-            'emergency_contact': emergency_contact.pk,
+            'address': address.pk if address else None,
+            'emergency_contact': emergency_contact.pk if emergency_contact else None,
             'insurance_provider': insurance.pk,
-            'doctors': data.getlist('doctor')
+            'doctors': doctors
         }
 
         serializer = PatientSerializer(data=patient_data)
@@ -135,7 +136,7 @@ class PatientCreateView(BaseCreateView):
             # If validation fails, print errors
             print("Validation Failed: Errors occurred.")
             print(serializer.errors)
-            errors['nurse'] = serializer.errors
+            errors['patient'] = serializer.errors
         print("The errors are:")
         print(errors)
         return errors

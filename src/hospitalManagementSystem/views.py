@@ -51,32 +51,31 @@ class BaseCreateView(View):
         raise NotImplementedError("Subclasses must implement create_related_models")
 
     def post(self, request, *args, **kwargs):
-        def post(self, request, *args, **kwargs):
-            """
-            Handles POST requests to process the form submission.
+        """
+        Handles POST requests to process the form submission.
 
-            Parameters:
-            request (HttpRequest): The incoming request object.
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
+        Parameters:
+        request (HttpRequest): The incoming request object.
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
 
-            Returns:
-            HttpResponse: The rendered form as an HttpResponse object in case of errors or success.
-            In case of errors, the rendered form includes error messages.
-            In case of success, the rendered form includes a success message.
+        Returns:
+        HttpResponse: The rendered form as an HttpResponse object in case of errors or success.
+        In case of errors, the rendered form includes error messages.
+        In case of success, the rendered form includes a success message.
 
-            Raises:
-            Exception: If an unhandled exception occurs during the processing of the form submission.
+        Raises:
+        Exception: If an unhandled exception occurs during the processing of the form submission.
 
-            The function performs the following steps:
-            1. Retrieves form data from the incoming POST request.
-            2. Calls the handle_transaction method to create related models within a transaction.
-            3. Prepares the context data by calling the get_context_data method.
-            4. If errors occur during the creation of related models, formats the errors, adds them to the context,
-               and renders the form with error messages.
-            5. If no errors occur, renders the form with a success message.
-            6. If an unhandled exception occurs, handles the exception by rendering the form with an error message.
-            """
+        The function performs the following steps:
+        1. Retrieves form data from the incoming POST request.
+        2. Calls the handle_transaction method to create related models within a transaction.
+        3. Prepares the context data by calling the get_context_data method.
+        4. If errors occur during the creation of related models, formats the errors, adds them to the context,
+           and renders the form with error messages.
+        5. If no errors occur, renders the form with a success message.
+        6. If an unhandled exception occurs, handles the exception by rendering the form with an error message.
+        """
         data = request.POST
         try:
             errors = self.handle_transaction(data)
