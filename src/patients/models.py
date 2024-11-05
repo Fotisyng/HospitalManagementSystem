@@ -2,17 +2,12 @@ from django.db import models
 from addresses.models import Address
 from emergency_contacts.models import EmergencyContact
 from insurances.models import Insurance
+from common.models import BasicInfo
 
 
-class Patient(models.Model):
+class Patient(BasicInfo):
     class Meta:
         db_table = 'patients'  # Set the table name to 'patients'
-
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('N/A', 'Not Applicable'),
-    ]
 
     STATUS_CHOICES = [
         ('active', 'Active'),
@@ -20,13 +15,7 @@ class Patient(models.Model):
         ('archived', 'Archived'),
     ]
 
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    date_of_birth = models.DateField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
-    phone_number = models.CharField(max_length=15)
-    email = models.EmailField()
     emergency_contact = models.OneToOneField(
         EmergencyContact,
         on_delete=models.CASCADE,

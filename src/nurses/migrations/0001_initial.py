@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('department', models.CharField(blank=True, max_length=50, null=True)),
                 ('role', models.CharField(choices=[('staff', 'Staff Nurse'), ('charge', 'Charge Nurse'), ('chief', 'Chief Nurse')], default='staff', max_length=10)),
                 ('date_hired', models.DateField()),
-                ('date_ended', models.DateField(blank=True, null=True)),
+                ('hiring_end_date', models.DateField(blank=True, null=True)),
                 ('address', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='addresses.address')),
                 ('emergency_contact', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='nurse_contact', to='emergency_contacts.emergencycontact')),
                 ('supervised_nurses', models.ManyToManyField(blank=True, related_name='supervised_by', to='nurses.nurse')),

@@ -1,7 +1,6 @@
 from django.db import models
 import requests
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 
@@ -40,7 +39,7 @@ class Address(models.Model):
                 "regionCode": region_code,  # CLDR country code (e.g., "US" for the United States)
                 "postalCode": self.postal_code,
                 "locality": self.city,
-                "addressLines": [self.street_address]  # Include the street address in addressLines
+                "addressLines": [self.street_address] if self.street_address else []  # Include the street address in addressLines
             },
             "enableUspsCass": False  # USPS CASS validation only applies for US addresses
         }
@@ -61,17 +60,27 @@ class Address(models.Model):
 
                 # Check for specific error message about unsupported region code
                 if response_data.get("error", {}).get("message", "").startswith("Unsupported region code"):
-                    # Skip validation and continue the process
                     print(f"Skipping validation for unsupported region code: {region_code}")
                     return
 
                 # For other API errors, raise a ValidationError
-                raise ValidationError("Postal code validation failed due to an API error.")
+                raise ValidationError("Address could not be validated.")
 
-            # Check for validation status in the response
             response_data = response.json()
-            if response_data.get("validationResult") and response_data["validationResult"]["result"] != "VALID":
-                raise ValidationError("Invalid postal code for the specified country.")
+
+            # Check for unconfirmed postal code in the response
+            address = response_data.get('result', {}).get('address', {})
+            address_components = address.get('addressComponents', [])
+
+            # Iterate through the address components to check for unconfirmed postal code
+            for component in address_components:
+                if component['componentType'] == 'postal_code':
+                    confirmation_level = component.get('confirmationLevel')
+
+                    # Raise an error if the postal code is unconfirmed but plausible
+                    if confirmation_level != 'CONFIRMED':
+                        raise ValidationError(
+                            f"Postal code '{self.postal_code}' could not be confirmed for the address provided.")
 
         except requests.RequestException:
             # Handle API connection errors gracefully

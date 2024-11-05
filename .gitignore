@@ -1,2 +1,6 @@
 # .gitignore
 .env
+node_modules
+venv_name
+src/static
+!src/static/css

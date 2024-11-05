@@ -4,62 +4,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A comprehensive hospital management system.">
+
     <title>{% block title %}Hospital Management System{% endblock %}</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <!-- jQuery (must be loaded before Bootstrap and Toastr) -->
+    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="{% static 'toastr/toastr.min.css' %}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/background.css' %}">
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Hospital Management</a>
-    <div class="collapse navbar-collapse">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Doctors
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{% url 'create-doctor' %}">Create Doctor</a>
-                    <a class="dropdown-item" href="{% url 'doctor-list' %}">List Doctors</a>
-                </div>
-            </li>
-            <!-- Patients Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="patientDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Patients
-                </a>
-                <div class="dropdown-menu" aria-labelledby="patientDropdown">
-                    <a class="dropdown-item" href="{% url 'create_patient' %}">Register Patient</a>
-                    <a class="dropdown-item" href="{% url 'patient-list' %}">List Patients</a>
-                    <!-- You can add the URL for listing patients here -->
-                </div>
-            </li>
-            <!-- Nurses Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="nurseDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Nurses
-                </a>
-                <div class="dropdown-menu" aria-labelledby="nurseDropdown">
-                    <a class="dropdown-item" href="{% url 'create_nurse' %}">Register Nurse</a>
-                    <a class="dropdown-item" href="{% url 'nurse-list' %}">List Nurses</a>
-                </div>
-            </li>
-        </ul>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">Hospital Management</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <!-- Doctors Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="doctorDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" aria-label="Doctors menu">
+                        Doctors
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="doctorDropdown">
+                        <li><a class="dropdown-item" href="{% url 'create-doctor' %}">Create Doctor</a></li>
+                        <li><a class="dropdown-item" href="{% url 'doctor-list' %}">List Doctors</a></li>
+                    </ul>
+                </li>
+
+                <!-- Patients Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="patientDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" aria-label="Patients menu">
+                        Patients
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="patientDropdown">
+                        <li><a class="dropdown-item" href="{% url 'create_patient' %}">Register Patient</a></li>
+                        <li><a class="dropdown-item" href="{% url 'patient-list' %}">List Patients</a></li>
+                    </ul>
+                </li>
+
+                <!-- Nurses Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="nurseDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" aria-label="Nurses menu">
+                        Nurses
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="nurseDropdown">
+                        <li><a class="dropdown-item" href="{% url 'create_nurse' %}">Register Nurse</a></li>
+                        <li><a class="dropdown-item" href="{% url 'nurse-list' %}">List Nurses</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Right Side Links (optional) -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Register</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
 
-<div class="container">
+<div class="container my-4">
     {% block content %}
     <!-- Content will be inserted here -->
     {% endblock %}
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Toastr JS -->
+<script src="{% static 'toastr/toastr.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        // Toastr settings
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "timeOut": "5000",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Other custom JS logic can be added here
+    });
+</script>
+
 {% block extra_js %}{% endblock %}
 </body>
 </html>

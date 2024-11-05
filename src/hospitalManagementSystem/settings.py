@@ -16,7 +16,7 @@ import os
 
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
 ADDRESS_VALIDATION_ENABLED = config('ADDRESS_VALIDATION_ENABLED')
-
+PROJECT_SECRET_KEY = config('PROJECT_SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1j36qtg^d*2tzj7+l*3qbdw1u$ssl*fp=ka#+j&5%b!pk2i!ki'
+SECRET_KEY = PROJECT_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -135,12 +135,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'doctors/templates/static',
+    BASE_DIR / 'static',
     os.path.join(BASE_DIR, 'static'),
 ]
 

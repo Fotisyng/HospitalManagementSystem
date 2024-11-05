@@ -7,10 +7,10 @@ from insurances.models import Insurance
 
 class PatientSerializer(serializers.ModelSerializer):
     # These will now accept the primary keys (foreign key relationships)
-    address = serializers.PrimaryKeyRelatedField(queryset=Address.objects.all())
-    emergency_contact = serializers.PrimaryKeyRelatedField(queryset=EmergencyContact.objects.all())
+    address = serializers.PrimaryKeyRelatedField(queryset=Address.objects.all(),allow_null=True)
+    emergency_contact = serializers.PrimaryKeyRelatedField(queryset=EmergencyContact.objects.all(),allow_null=True)
     insurance_provider = serializers.PrimaryKeyRelatedField(queryset=Insurance.objects.all())
-    doctors = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(), many=True)
+    doctors = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(), many=True, allow_null=True)
 
     class Meta:
         model = Patient
