@@ -63,17 +63,8 @@
 
         <button type="submit" class="btn btn-primary">Create Doctor</button>
 
-        {% if errors %}
-        <div class="error-list">
-            <ul>
-                {% for field, error_list in errors.items %}
-                {% for error in error_list %}
-                <li>{{ field }}: {{ error }}</li>
-                {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
+        <!-- Include Toastr errors -->
+        {% include 'toastr_errors.html' %}
     </form>
 </div>
 {% endblock %}

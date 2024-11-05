@@ -84,21 +84,8 @@
 
         <button type="submit" class="btn btn-primary">Create Nurse</button>
 
-        <!-- Error Messages (Specific to this template) -->
-        {% if errors %}
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                {% for error in errors %}
-                    // Display the error message only
-                    toastr.error("{{ error }}", "Validation Error", {
-                        "closeButton": true,
-                        "progressBar": true,
-                        "timeOut": "5000"
-                    });
-                {% endfor %}
-            });
-        </script>
-        {% endif %}
+        <!-- Include Toastr errors -->
+        {% include 'toastr_errors.html' %}
     </form>
 </div>
 {% endblock %}
