@@ -15,6 +15,20 @@
         {% include 'basic_info_form.html' %}
 
         <div class="form-group">
+            <label for="date_of_birth">Date of Birth:</label>
+            <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="gender">Gender:</label>
+            <select name="gender" id="gender" class="form-control" required>
+                {% for code, name in gender_choices %}
+                <option value="{{ code }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="specialty">Specialty:</label>
             <select name="specialty" id="specialty" class="form-control" required>
                 {% for code, name in specialty_choices %}
@@ -28,9 +42,24 @@
             <input type="text" name="license_number" id="license_number" class="form-control" required>
         </div>
 
+        <!-- Date Hired -->
+        <div class="form-group">
+            <label for="date_hired">Date Hired:</label>
+            <input type="date" name="date_hired" id="date_hired" class="form-control" required>
+        </div>
+
+        <!-- Hiring End Date (Optional) -->
+        <div class="form-group">
+            <label for="hiring_end_date">End Date:</label>
+            <input type="date" name="hiring_end_date" id="hiring_end_date" class="form-control">
+        </div>
+
         <h3>Doctor Address</h3>
         <!-- Include the common address fields -->
         {% include 'address_form.html' with countries=countries %}
+
+        <!-- Include the emergency contact fields -->
+        {% include 'emergency_contact_form.html' with countries=countries %}
 
         <button type="submit" class="btn btn-primary">Create Doctor</button>
 

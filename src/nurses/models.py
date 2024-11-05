@@ -44,6 +44,7 @@ class Nurse(BasicInfo):
         ('vascular_surgery', 'Vascular Surgery'),
         ('plastic_surgery', 'Plastic Surgery'),
     ]
+
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
     emergency_contact = models.OneToOneField(
         EmergencyContact,

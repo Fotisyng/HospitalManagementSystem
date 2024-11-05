@@ -21,7 +21,7 @@ class BasicInfo(models.Model):
         ]
     )
     email = models.EmailField()
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='Other')
     date_of_birth = models.DateField()
 
     class Meta:

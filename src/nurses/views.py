@@ -68,8 +68,6 @@ class NurseCreateView(BaseCreateView):
             errors['emergency_contact_address'] = {'messages': [str(error) for error in e.error_list]}
 
         # Create Emergency Contact
-        print("The emergency contact date of birth")
-        print(data.get('emergency_contact_date_of_birth'))  # Print the date value from the form
         emergency_contact = None
         if all(data.get(field, '').strip() for field in
                ['emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_phone_number',
