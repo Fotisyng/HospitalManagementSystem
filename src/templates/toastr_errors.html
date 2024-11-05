@@ -1,0 +1,13 @@
+{% if errors %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        {% for error in errors %}
+            toastr.error("{{ error }}", "Validation Error", {
+                "closeButton": true,
+                "progressBar": true,
+                "timeOut": "5000"
+            });
+        {% endfor %}
+    });
+</script>
+{% endif %}
