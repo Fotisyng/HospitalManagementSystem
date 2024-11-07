@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
-
+from config.url_names import DOCTOR_LIST
 
 class DoctorCreateFormView(BaseCreateView):
     template_name = 'doctor_form.html'
@@ -62,10 +62,10 @@ class DoctorUpdateView(UpdateView):
     model = Doctor
     fields = ['first_name', 'last_name', 'specialty', 'phone_number', 'email', 'license_number']  # Add other fields as needed
     template_name = 'doctor_update_form.html'
-    success_url = '/doctors/list'  # Redirect to the doctor list or detail after successful update
+    success_url = reverse_lazy(DOCTOR_LIST)
 
 
 class DoctorDeleteView(DeleteView):
     model = Doctor
     template_name = 'doctor_confirm_delete.html'  # Create this template for delete confirmation
-    success_url = reverse_lazy('doctor-list')  # Redirect to doctor list after successful deletion
+    success_url = reverse_lazy(DOCTOR_LIST)  # Redirect to doctor list after successful deletion
