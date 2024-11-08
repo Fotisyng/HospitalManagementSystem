@@ -23,8 +23,8 @@
                 <strong>Medical History:</strong> {{ patient.medical_history }}<br>
                 <strong>Status:</strong> {{ patient.status }}<br>
             </p>
-            <a href="{% url 'patient-update' patient.pk %}" class="btn btn-warning">Edit Profile</a>
-            <a href="{% url 'patient-delete' patient.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
+            <a href="{% url PATIENT_UPDATE patient.pk %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url PATIENT_DELETE patient.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
                 Delete Profile</a>
         </div>
     </div>

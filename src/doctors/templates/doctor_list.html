@@ -2,9 +2,6 @@
 
 {% block title %}Doctor List{% endblock %}
 {% load static %}
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'doctor_list.css' %}">
-{% endblock %}
 
 {% block content %}
 <div class="container my-4">
@@ -12,7 +9,7 @@
     <div class="row">
         {% for doctor in doctors %}
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm" style="border-color: #316e83; border-width: 2px;">
                 <div class="card-body">
                     <h5 class="card-title">{{ doctor.first_name }} {{ doctor.last_name }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ doctor.specialty }}</h6>
@@ -22,8 +19,8 @@
                         <strong>License Number:</strong> {{ doctor.license_number }}<br>
                     </p>
                 </div>
-                <div class="card-footer text-center">
-                    <a href="{% url 'doctor-detail' doctor.pk %}" class="btn btn-primary">View Profile</a>
+                <div class="card-footer text-center" style="background-color: #f8f9fa;">
+                    <a href="{% url DOCTOR_DETAIL doctor.pk %}" class="btn btn-primary">View Profile</a>
                 </div>
             </div>
         </div>

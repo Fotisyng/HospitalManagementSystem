@@ -60,7 +60,7 @@ class DoctorDetailView(DetailView):
 
 class DoctorUpdateView(UpdateView):
     model = Doctor
-    fields = ['first_name', 'last_name', 'specialty', 'phone_number', 'email', 'license_number']  # Add other fields as needed
+    fields = '__all__'
     template_name = 'doctor_update_form.html'
     success_url = reverse_lazy(DOCTOR_LIST)
 

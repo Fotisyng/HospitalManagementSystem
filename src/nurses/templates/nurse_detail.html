@@ -28,8 +28,8 @@
                 {% endfor %}
             </ul>
             </p>
-            <a href="{% url 'nurse-update' nurse.pk %}" class="btn btn-warning">Edit Profile</a>
-            <a href="{% url 'nurse-delete' nurse.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
+            <a href="{% url NURSE_UPDATE nurse.pk %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url NURSE_DELETE nurse.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
                 Delete Profile</a>
         </div>
     </div>
