@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
 from config.url_names import DOCTOR_LIST
+from django.shortcuts import redirect
 
 class DoctorCreateFormView(BaseCreateView):
     template_name = 'doctor_form.html'
@@ -63,6 +64,25 @@ class DoctorUpdateView(UpdateView):
     fields = '__all__'
     template_name = 'doctor_update_form.html'
     success_url = reverse_lazy(DOCTOR_LIST)
+
+    def form_valid(self, form):
+        # Save the doctor instance without updating 'patients' to avoid clearing it
+        doctor = form.save(commit=False)
+        doctor.save()
+
+        # Handle 'patients' field separately if it's included in POST data
+        if 'patients' in self.request.POST:
+            # Update the many-to-many field with provided patient IDs
+            patients = form.cleaned_data.get('patients')
+            doctor.patients.set(patients)  # Update only if 'patients' data exists in the request
+
+        # Redirect or render a success message as needed
+        return redirect(DOCTOR_LIST)
+
+    def form_invalid(self, form):
+        print("Form is invalid!", form.errors)
+        print("Form initial data:", form.initial)
+        return super().form_invalid(form)
 
 
 class DoctorDeleteView(DeleteView):
