@@ -10,9 +10,13 @@ DOCTOR_LIST = 'doctor-list'
 DOCTOR_DETAIL = 'doctor-detail'
 DOCTOR_UPDATE = 'doctor-update'
 DOCTOR_DELETE = 'doctor-delete'
+ASSIGN_PATIENT = 'assign-patients'
 
 NURSE_CREATE = 'nurse-create'
 NURSE_LIST = 'nurse-list'
 NURSE_DETAIL = 'nurse-detail'
 NURSE_UPDATE = 'nurse-update'
 NURSE_DELETE = 'nurse-delete'
+
+SEARCH_DOCTOR = 'search-doctor'
+SEARCH_PATIENT = 'search-patient'

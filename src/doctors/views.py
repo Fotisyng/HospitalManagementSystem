@@ -1,11 +1,14 @@
+import json
 from .models import Doctor
 from .serializers import DoctorSerializer
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
-from config.url_names import DOCTOR_LIST
-from django.shortcuts import redirect
+from config.url_names import DOCTOR_LIST, DOCTOR_DETAIL
+from django.shortcuts import redirect, render
+from .forms import AssignPatientsForm
+
 
 class DoctorCreateFormView(BaseCreateView):
     template_name = 'doctor_form.html'
@@ -66,26 +69,60 @@ class DoctorUpdateView(UpdateView):
     success_url = reverse_lazy(DOCTOR_LIST)
 
     def form_valid(self, form):
-        # Save the doctor instance without updating 'patients' to avoid clearing it
+        """
+        Perform the update operation on the specified doctor and update
+        the 'patients' field if included in POST data.
+
+        Note: The 'patients' field is not updated directly in this view,
+        but rather in the form_valid method. This is done to avoid clearing
+        the 'patients' field during the update operation.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the updated data.
+        """
         doctor = form.save(commit=False)
         doctor.save()
 
         # Handle 'patients' field separately if it's included in POST data
         if 'patients' in self.request.POST:
-            # Update the many-to-many field with provided patient IDs
             patients = form.cleaned_data.get('patients')
-            doctor.patients.set(patients)  # Update only if 'patients' data exists in the request
+            doctor.patients.set(patients)
 
-        # Redirect or render a success message as needed
         return redirect(DOCTOR_LIST)
 
     def form_invalid(self, form):
+        """
+        Handle the invalid form submission.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the invalid data.
+        """
         print("Form is invalid!", form.errors)
-        print("Form initial data:", form.initial)
         return super().form_invalid(form)
 
 
 class DoctorDeleteView(DeleteView):
     model = Doctor
-    template_name = 'doctor_confirm_delete.html'  # Create this template for delete confirmation
-    success_url = reverse_lazy(DOCTOR_LIST)  # Redirect to doctor list after successful deletion
+    template_name = 'doctor_confirm_delete.html'
+    success_url = reverse_lazy(DOCTOR_LIST)
+
+
+class AssignPatientsView(View):
+    def get(self, request):
+        form = AssignPatientsForm()
+        return render(request, 'assign_patients.html', {'form': form})
+
+    def post(self, request):
+        form = AssignPatientsForm(request.POST)
+        if form.is_valid():
+            doctor = form.cleaned_data['doctor']
+            patients = form.cleaned_data['patients']
+
+            # Add selected patients to the doctor
+            doctor.patients.add(*patients)
+
+            # Redirect to doctor detail view after successful assignment
+            return redirect(DOCTOR_DETAIL, pk=doctor.pk)
+
+        # If form is not valid, re-render the page with form errors
+        return render(request, 'assign_patients.html', {'form': form})

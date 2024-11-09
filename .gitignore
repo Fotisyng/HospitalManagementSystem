@@ -2,5 +2,6 @@
 .env
 node_modules
 venv_name
-src/static
-!src/static/css
+src/static/bootstrap
+src/static/toastr
+src/static/jquery

@@ -16,10 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .search_views import search_doctor_view, search_patient_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('doctors/', include('doctors.urls')),
     path('patients/', include('patients.urls')),
-    path('nurses/', include('nurses.urls'))
+    path('nurses/', include('nurses.urls')),
+    path("search/doctor/", search_doctor_view, name="search_doctor"),
+    path("search/patient/", search_patient_view, name="search_patient"),
 ]
