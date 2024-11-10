@@ -111,18 +111,3 @@ class AssignPatientsView(View):
     def get(self, request):
         form = AssignPatientsForm()
         return render(request, 'assign_patients.html', {'form': form})
-
-    def post(self, request):
-        form = AssignPatientsForm(request.POST)
-        if form.is_valid():
-            doctor = form.cleaned_data['doctor']
-            patients = form.cleaned_data['patients']
-
-            # Add selected patients to the doctor
-            doctor.patients.add(*patients)
-
-            # Redirect to doctor detail view after successful assignment
-            return redirect(DOCTOR_DETAIL, pk=doctor.pk)
-
-        # If form is not valid, re-render the page with form errors
-        return render(request, 'assign_patients.html', {'form': form})

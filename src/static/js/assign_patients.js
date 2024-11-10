@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const assignButton = document.getElementById('assign-button');
 
-    // Handle assignment of selected patients to a doctor
     assignButton.addEventListener('click', function () {
         const selectedDoctorId = window.selectedDoctorId;
         const selectedPatientIds = window.selectedPatientIds || [];
@@ -12,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 patient_ids: selectedPatientIds,
             };
 
-            fetch('/doctors/api/assign-patients/', {  // New API endpoint
+            fetch('/doctors/api/assign-patients/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -23,15 +22,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => response.json())
                 .then(data => {
                     if (data.message) {
-                        alert(data.message);
-                        window.selectedPatientIds = []; // Clear selected patients after assignment
+                        // Show success toastr message
+                        toastr.success(data.message);
+
+                        // Redirect to the doctor detail page after a short delay
+                        setTimeout(() => {
+                            window.location.href = `/doctors/doctors/${selectedDoctorId}/`;
+                        }, 1500);  // Optional delay for user to see the toastr message
                     } else if (data.error) {
-                        alert(data.error);
+                        toastr.error(data.error);
                     }
                 })
-                .catch(error => console.error('Error assigning patients:', error));
+                .catch(error => {
+                    toastr.error('An error occurred while assigning patients.');
+                    console.error('Error assigning patients:', error);
+                });
         } else {
-            alert('Please select a doctor and at least one patient.');
+            toastr.warning('Please select a doctor and at least one patient.');
         }
     });
 }, { once: true });
