@@ -1,15 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Doctor{% endblock %}
+{% block title %}Register Doctor{% endblock %}
 {% load static %}
 {% block content %}
 <div class="form-container">
-    <h2>Create Doctor</h2>
+    <h2>Register Doctor</h2>
     <form method="post">
         {% csrf_token %}
-        {% block extra_css %}
-        <link rel="stylesheet" href="{% static 'doctor_form.css' %}">
-        {% endblock %}
 
         <!-- Include the common basic information fields -->
         {% include 'basic_info_form.html' %}

@@ -13,15 +13,29 @@
                 <strong>Date of Birth:</strong> {{ nurse.date_of_birth }}<br>
                 <strong>Email:</strong> {{ nurse.email }}<br>
                 <strong>Phone:</strong> {{ nurse.phone_number }}<br>
-                <strong>Address:</strong> {{ nurse.address.street_address }}, {{ nurse.address.city }},
-                {{ nurse.address.state }}, {{ nurse.address.postal_code }}, {{ nurse.address.country }}<br>
+                <strong>Address:</strong>
+                {% if doctor.address %}
+                {{ nurse.address.street_address }}, {{ nurse.address.city }},
+                {{ nurse.address.state }}, {{ nurse.address.postal_code }},
+                {{ nurse.address.country }}
+                {% else %}
+                Not Provided
+                {% endif %}<br>
+
+                <strong>Emergency Contact:</strong>
+                {% if doctor.emergency_contact %}
+                {{ nurse.emergency_contact.first_name }} {{ nurse.emergency_contact.last_name }} -
+                {{ nurse.emergency_contact.phone_number }}
+                {% else %}
+                Not Provided
+                {% endif %}<br>
                 <strong>License Number:</strong> {{ nurse.license_number }}<br>
                 <strong>Department:</strong> {{ nurse.department }}<br>
                 <strong>Date Hired:</strong> {{ nurse.date_hired }}<br>
-                <strong>Date Ended:</strong> {{ nurse.date_ended }}<br>
+                <strong>Hiring End Date:</strong> {{ nurse.date_ended }}<br>
                 <strong>Supervised Nurses:</strong>
             <ul>
-                {% for supervised_nurse in nurse.supervised_nurses.all %}
+                {% for supervised_nurse in nurse.supervised_by.all %}
                 <li>{{ supervised_nurse.first_name }} {{ supervised_nurse.last_name }}</li>
                 {% empty %}
                 <li>No supervised nurses.</li>

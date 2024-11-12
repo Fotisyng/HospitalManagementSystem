@@ -1,4 +1,3 @@
-import json
 from .models import Doctor
 from .serializers import DoctorSerializer
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, View
@@ -109,5 +108,14 @@ class DoctorDeleteView(DeleteView):
 
 class AssignPatientsView(View):
     def get(self, request):
+        """
+        Display the form to assign patients to a doctor.
+
+        Args:
+            request (django.http.HttpRequest): The HTTP request object.
+
+        Returns:
+            django.http.HttpResponse: The rendered HTML template with the form.
+        """
         form = AssignPatientsForm()
         return render(request, 'assign_patients.html', {'form': form})

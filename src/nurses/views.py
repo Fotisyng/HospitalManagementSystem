@@ -4,6 +4,8 @@ from .models import Nurse
 from .serializers import NurseSerializer
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
+from django.shortcuts import redirect
+from config.url_names import NURSE_LIST
 
 
 class NurseCreateView(BaseCreateView):
@@ -58,21 +60,48 @@ class NurseCreateView(BaseCreateView):
 
 class NurseListView(ListView):
     model = Nurse
-    template_name = 'nurse_list.html'  # Create this template
-    context_object_name = 'nurses'  # The name to access the list in the template
+    template_name = 'nurse_list.html'
+    context_object_name = 'nurses'
 
 
 class NurseDetailView(DetailView):
+    """
+    Show a nurse's details view. This view displays information about the specified nurse.
+    """
     model = Nurse
     template_name = 'nurse_detail.html'
-    context_object_name = 'nurse'  # The name to access the list in the template
+    context_object_name = 'nurse'
 
 
 class NurseUpdateView(UpdateView):
+    """
+    Update a nurse's information.
+    If the supervisor_nurses field is included in POST data, it will be updated
+    along with the rest of the form data.
+    """
     model = Nurse
-    fields = '__all__'  # All fields will be editable
-    template_name = 'nurse_update_form.html'  # The template to render the form
-    success_url = reverse_lazy('nurse-list')  # Redirect to the list after successful update
+    fields = '__all__'
+    template_name = 'nurse_update_form.html'
+    success_url = reverse_lazy(NURSE_LIST)
+
+    def form_valid(self, form):
+        """
+        Perform the update operation on the specified nurse and update
+        the 'supervisor_nurses' field if included in POST data. This is in order
+        not to overwrite existing fields.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the updated data.
+        """
+        nurse = form.save(commit=False)
+        nurse.save()
+
+        # Handle 'supervisor_nurses' field separately if included in POST data
+        if 'supervisor_nurses' in self.request.POST:
+            supervisor_nurses = form.cleaned_data.get('supervisor_nurses')
+            nurse.supervisor_nurses.set(supervisor_nurses)
+
+        return redirect(self.success_url)
 
 
 class NurseDeleteView(DeleteView):
