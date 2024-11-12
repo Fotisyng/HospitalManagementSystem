@@ -4,7 +4,7 @@ from emergency_contacts.models import EmergencyContact
 from common.models import BasicInfo
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-
+from config.constants import DEPARTMENT_CHOICES
 
 class Nurse(BasicInfo):
 
@@ -15,34 +15,6 @@ class Nurse(BasicInfo):
         ('staff', 'Staff Nurse'),
         ('charge', 'Charge Nurse'),  # supervises nursing staff during a shift
         ('chief', 'Chief Nurse'),  # responsible for overall management of nursing staff in the facility
-    ]
-
-    DEPARTMENT_CHOICES = [
-        ('cardiology', 'Cardiology'),
-        ('neurology', 'Neurology'),
-        ('oncology', 'Oncology'),
-        ('pediatrics', 'Pediatrics'),
-        ('surgery', 'Surgery'),
-        ('anesthesiology', 'Anesthesiology'),
-        ('dermatology', 'Dermatology'),
-        ('emergency_medicine', 'Emergency Medicine'),
-        ('endocrinology', 'Endocrinology'),
-        ('gastroenterology', 'Gastroenterology'),
-        ('gynecology', 'Gynecology'),
-        ('hematology', 'Hematology'),
-        ('infectious_disease', 'Infectious Disease'),
-        ('nephrology', 'Nephrology'),
-        ('obstetrics', 'Obstetrics'),
-        ('orthopedics', 'Orthopedics'),
-        ('otolaryngology', 'Otolaryngology (ENT)'),
-        ('pathology', 'Pathology'),
-        ('psychiatry', 'Psychiatry'),
-        ('pulmonology', 'Pulmonology'),
-        ('radiology', 'Radiology'),
-        ('rheumatology', 'Rheumatology'),
-        ('urology', 'Urology'),
-        ('vascular_surgery', 'Vascular Surgery'),
-        ('plastic_surgery', 'Plastic Surgery'),
     ]
 
     address = models.OneToOneField(Address, on_delete=models.CASCADE, null=True, blank=True)
