@@ -6,8 +6,6 @@ from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
 from config.url_names import DOCTOR_LIST, DOCTOR_DETAIL
 from django.shortcuts import redirect, render
-from .forms import AssignPatientsForm
-
 
 class DoctorCreateFormView(BaseCreateView):
     template_name = 'doctor_form.html'
@@ -117,5 +115,4 @@ class AssignPatientsView(View):
         Returns:
             django.http.HttpResponse: The rendered HTML template with the form.
         """
-        form = AssignPatientsForm()
-        return render(request, 'assign_patients.html', {'form': form})
+        return render(request, 'assign_patients.html')
