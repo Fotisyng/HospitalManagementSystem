@@ -17,6 +17,7 @@ NURSE_LIST = 'nurse-list'
 NURSE_DETAIL = 'nurse-detail'
 NURSE_UPDATE = 'nurse-update'
 NURSE_DELETE = 'nurse-delete'
+NURSE_ASSIGN = 'nurse-assign'
 
 SEARCH_DOCTOR = 'search-doctor'
 SEARCH_PATIENT = 'search-patient'

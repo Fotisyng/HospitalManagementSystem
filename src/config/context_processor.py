@@ -15,6 +15,7 @@ from config.url_names import (
     NURSE_DETAIL,
     NURSE_UPDATE,
     NURSE_DELETE,
+    NURSE_ASSIGN,
     SEARCH_PATIENT,
     SEARCH_DOCTOR,
 )
@@ -47,6 +48,7 @@ def url_names(request):
         'NURSE_DETAIL': NURSE_DETAIL,
         'NURSE_UPDATE': NURSE_UPDATE,
         'NURSE_DELETE': NURSE_DELETE,
+        'NURSE_ASSIGN': NURSE_ASSIGN,
         'SEARCH_PATIENT': SEARCH_PATIENT,
         'SEARCH_DOCTOR': SEARCH_DOCTOR,
     }

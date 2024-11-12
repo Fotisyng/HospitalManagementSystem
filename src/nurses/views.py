@@ -1,10 +1,10 @@
-from django.views.generic import ListView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, UpdateView, DeleteView, DetailView, View
 from django.urls import reverse_lazy
 from .models import Nurse
 from .serializers import NurseSerializer
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from config.url_names import NURSE_LIST
 
 
@@ -108,3 +108,20 @@ class NurseDeleteView(DeleteView):
     model = Nurse
     template_name = 'nurse_confirm_delete.html'  # Create this template for delete confirmation
     success_url = reverse_lazy('nurse-list')  # Redirect to list after successful deletion
+
+
+class AssignNursesView(View):
+    """
+    A class that handles the view to assign nurses to a supervising nurse.
+    """
+    def get(self, request):
+        """
+        Display the form to assign nurses to a supervising nurse.
+
+        Args:
+            request (django.http.HttpRequest): The HTTP request object.
+
+        Returns:
+            django.http.HttpResponse: The rendered HTML template with the form.
+        """
+        return render(request, 'nurse_assign.html')

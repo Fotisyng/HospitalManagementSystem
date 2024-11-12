@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .search_views import search_doctor_view, search_patient_view
+from .search_views import search_doctor_view, search_patient_view, search_nurse_view, search_supervisor_nurse_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,6 @@ urlpatterns = [
     path('nurses/', include('nurses.urls')),
     path("search/doctor/", search_doctor_view, name="search_doctor"),
     path("search/patient/", search_patient_view, name="search_patient"),
+    path('search/supervisor-nurse/', search_supervisor_nurse_view, name='search_supervisor_nurse'),
+    path('search/nurse/', search_nurse_view, name='search_nurse'),
 ]
