@@ -6,6 +6,8 @@ from .serializers import PatientSerializer
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
+from django.shortcuts import redirect
+from config.url_names import PATIENT_LIST
 
 
 class PatientCreateView(BaseCreateView):
@@ -94,9 +96,38 @@ class PatientDetailView(DetailView):
 
 class PatientUpdateView(UpdateView):
     model = Patient
-    fields = '__all__'  # All fields will be editable
-    template_name = 'patient_update_form.html'  # The template to render the form
-    success_url = reverse_lazy('patient-list')  # Redirect to the list after successful update
+    fields = '__all__'  # You can use '__all__' or specify specific fields.
+    template_name = 'patient_update_form.html'  # Path to the template
+    success_url = reverse_lazy(PATIENT_LIST)  # Adjust the URL name as per your project
+
+    def form_valid(self, form):
+        """
+        Perform the update operation on the specified patient and handle
+        any additional fields as needed, such as related models.
+
+        Args:
+            form: The valid form instance.
+        """
+        patient = form.save(commit=False)
+        patient.save()
+
+        # Example: handle 'emergency_contact' if it's in POST data
+        if 'emergency_contact' in self.request.POST:
+            emergency_contact = form.cleaned_data.get('emergency_contact')
+            patient.emergency_contact = emergency_contact
+            patient.save()
+
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        """
+        Handle the invalid form submission.
+
+        Args:
+            form: The invalid form instance.
+        """
+        print("Form is invalid!", form.errors)
+        return super().form_invalid(form)
 
 
 class PatientDeleteView(DeleteView):

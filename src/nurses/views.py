@@ -103,6 +103,16 @@ class NurseUpdateView(UpdateView):
 
         return redirect(self.success_url)
 
+    def form_invalid(self, form):
+        """
+        Handle the invalid form submission.
+
+        Args:
+            form: The invalid form instance.
+        """
+        print("Form is invalid!", form.errors)
+        return super().form_invalid(form)
+
 
 class NurseDeleteView(DeleteView):
     model = Nurse
