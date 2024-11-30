@@ -20,7 +20,7 @@ from config.url_names import (
     SEARCH_DOCTOR,
 )
 
-def url_names(request):
+def url_names(request)-> dict:
     """
     Returns a dictionary of URL names used in the application and is used a context_processor for accessing
     the constants in templates.

@@ -5,14 +5,24 @@ from django.urls import reverse_lazy
 from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
 from config.url_names import DOCTOR_LIST, DOCTOR_DETAIL
+from config.constants import APP_LOGER
 from django.shortcuts import redirect, render
+import logging
+
+logger = logging.getLogger(APP_LOGER)
 
 class DoctorCreateFormView(BaseCreateView):
+    """
+    Form view for creating a new doctor.
+    """
+
     template_name = 'doctor_form.html'
     success_message = 'Doctor registered successfully!'
 
     def get_context_data(self):
-        """Extends the base context with additional doctor-specific context data."""
+        """
+        Extends the base context with additional doctor-specific context data.
+        """
         context = super().get_context_data()
         specialty_choices = Doctor.SPECIALTY_CHOICES
         gender_choices = Doctor.GENDER_CHOICES
@@ -24,9 +34,17 @@ class DoctorCreateFormView(BaseCreateView):
 
         return context
 
-    def create_related_models(self, data):
-        """Handles doctor-specific related model creation. The doctor address and
-        emergency_contact are also created along with the doctor object."""
+    def create_related_models(self, data: dict) -> dict:
+        """
+        Handles doctor-specific related model creation. The doctor address and
+        emergency_contact are also created along with the doctor object.
+
+        Args:
+            data (dict): The data from the request to process to create the doctor
+
+        Returns:
+            dict: The errors from the procedure. In case no errors are thrown, an empty dict is returned
+        """
         address, emergency_contact, errors = create_address_and_contact(data)
 
         # Extract doctor data
@@ -34,32 +52,40 @@ class DoctorCreateFormView(BaseCreateView):
         serializer = DoctorSerializer(data=doctor_data)
 
         if serializer.is_valid():
-            print("Validation Passed: Data is valid.")
             doctor = serializer.save()
-            print(f"Doctor Created: {doctor}")
+            logger.info(f"Doctor created successfully: {doctor}")
         else:
-            # If validation fails, print errors
-            print("Validation Failed: Errors occurred.")
-            print(serializer.errors)
+            logger.error(f"Doctor validation failed due to: {serializer.errors}")
             errors['doctor'] = serializer.errors
-        print("The errors are:")
-        print(errors)
+        logger.error(f"Doctor creation failed due to the following errors: {errors}")
         return errors
 
 
 class DoctorListView(ListView):
+    """
+    List view for all doctors.
+    """
+
     model = Doctor
     template_name = 'doctor_list.html'  # The template that will render the list
     context_object_name = 'doctors'  # The name to access the list in the template
 
 
 class DoctorDetailView(DetailView):
+    """
+    Detail view for a doctor.
+    """
+
     model = Doctor
     template_name = 'doctor_detail.html'
     context_object_name = 'doctor'
 
 
 class DoctorUpdateView(UpdateView):
+    """
+    Update the details of a doctor view.
+    """
+
     model = Doctor
     fields = '__all__'
     template_name = 'doctor_update_form.html'
@@ -94,17 +120,25 @@ class DoctorUpdateView(UpdateView):
         Args:
             form (forms.ModelForm): The form instance containing the invalid data.
         """
-        print("Form is invalid!", form.errors)
+        logger.error(f"The update of the doctor failed: {form.errors}")
         return super().form_invalid(form)
 
 
 class DoctorDeleteView(DeleteView):
+    """
+    A class for deleting a doctor operation.
+    """
+
     model = Doctor
     template_name = 'doctor_confirm_delete.html'
     success_url = reverse_lazy(DOCTOR_LIST)
 
 
 class AssignPatientsView(View):
+    """
+    A class for the assigning patients to a doctor operation.
+    """
+
     def get(self, request):
         """
         Display the form to assign patients to a doctor.

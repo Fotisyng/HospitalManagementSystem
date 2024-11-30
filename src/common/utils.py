@@ -49,8 +49,9 @@ INSURANCE_PROVIDER = 'insurance_provider'
 DOCTORS = 'doctors'
 SUPERVISOR_NURSE = 'supervisor_nurse'
 
+
 # Helper to create an address and handle errors
-def create_address_helper(data, prefix="") -> Tuple[Optional[Address], Optional[dict]]:
+def create_address_helper(data: dict, prefix="") -> Tuple[Optional[Address], Optional[dict]]:
     """
     Creates an Address instance if sufficient data is provided.
 
@@ -107,7 +108,9 @@ def create_emergency_contact_helper(data, address) -> Tuple[Optional[EmergencyCo
     # Return None if not all required fields are provided
     return None, None
 
-def create_address_and_contact(data, prefix=""):
+
+def create_address_and_contact(data: dict, prefix="") -> (
+        Tuple)[Optional[Address], Optional[EmergencyContact], Optional[dict]]:
     """
     Creates an Address and EmergencyContact instance if sufficient data is provided.
 
@@ -123,12 +126,10 @@ def create_address_and_contact(data, prefix=""):
     """
     errors = {}
 
-    # Create address for the main person (Doctor/Nurse)
     address, address_errors = create_address_helper(data, prefix=prefix)
     if address_errors:
         errors['address'] = address_errors
 
-    # Create address for emergency contact
     emergency_contact_address, emergency_contact_address_errors = create_address_helper(
         data,
         prefix=f'{prefix}emergency_contact_'
@@ -136,13 +137,11 @@ def create_address_and_contact(data, prefix=""):
     if emergency_contact_address_errors:
         errors['emergency_contact_address'] = emergency_contact_address_errors
 
-    # Create emergency contact
     emergency_contact, emergency_contact_errors = create_emergency_contact_helper(data, emergency_contact_address)
     if emergency_contact_errors:
         errors['emergency_contact'] = emergency_contact_errors
 
     return address, emergency_contact, errors
-
 
 
 def prepare_model_data(

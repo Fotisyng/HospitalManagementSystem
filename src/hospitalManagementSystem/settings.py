@@ -9,18 +9,22 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import os
+import sentry_sdk
 
 from pathlib import Path
 from decouple import config
-import os
 
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY')
-ADDRESS_VALIDATION_ENABLED = config('ADDRESS_VALIDATION_ENABLED')
+ADDRESS_VALIDATION_ENABLED = config('ADDRESS_VALIDATION_ENABLED', default=False, cast=bool)
 PROJECT_SECRET_KEY = config('PROJECT_SECRET_KEY')
+SENTRY_PUBLIC_KEY_DSN = config('SENTRY_PUBLIC_KEY_DSN')
+SENTRY_SUFFIX_DSN = config('SENTRY_SUFFIX_DSN')
+SENTRY_PROJECT_ID = config('SENTRY_PROJECT_ID')
+SENTRY_ENABLED = config('SENTRY_ENABLED', default=False, cast=bool)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -33,7 +37,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+# Initialize sentry sdk
+if SENTRY_ENABLED:
+    sentry_sdk.init(
+        dsn=f"https://{SENTRY_PUBLIC_KEY_DSN}@{SENTRY_SUFFIX_DSN}.sentry.io/{SENTRY_PROJECT_ID}",
+        # Set traces_sample_rate to 1.0 to capture 100% of transactions for tracing.
+        traces_sample_rate=1.0,
+        default_integrations=False,
+        _experiments={
+            # Set continuous_profiling_auto_start to True to automatically start the profiler on when possible.
+            "continuous_profiling_auto_start": True,
+        },
+    )
 # Application definition
 
 INSTALLED_APPS = [
@@ -87,21 +102,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hospitalManagementSystem.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config("DATABASE_NAME"),         # Replace with your database name
-        'USER': config("DATABASE_USER"),         # Replace with your MySQL username
-        'PASSWORD': config("DATABASE_PASSWORD"), # Replace with your MySQL password
-        'HOST': config("DATABASE_HOST"),         # Or your database host
-        'PORT': '3306',                          # Default MySQL port
+        'NAME': config("DATABASE_NAME"),  # Replace with your database name
+        'USER': config("DATABASE_USER"),  # Replace with your MySQL username
+        'PASSWORD': config("DATABASE_PASSWORD"),  # Replace with your MySQL password
+        'HOST': config("DATABASE_HOST"),  # Or your database host
+        'PORT': '3306',  # Default MySQL port
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -121,7 +134,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -132,7 +144,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -151,3 +162,62 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.utils.autoreload': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'hospital_management_system_logger': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+# Add the Sentry handler only if Sentry is enabled
+if SENTRY_ENABLED:
+    LOGGING['handlers']['sentry'] = {
+        'level': 'ERROR',  # Only send error level and above to Sentry
+        'class': 'sentry_sdk.integrations.logging.SentryHandler',
+    }
+    for logger in LOGGING['loggers'].values():
+        logger['handlers'].append('sentry')

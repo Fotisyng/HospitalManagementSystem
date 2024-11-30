@@ -26,9 +26,28 @@ class NurseSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
+        """
+        Validate the data before creating the Nurse instance.
+        This method is called automatically when saving the serializer instance.
+
+        Args:
+            data (dict): The validated data.
+
+        Returns:
+            dict: The validated data.
+        """
         nurse_instance = Nurse(**data)
         nurse_instance.clean()
         return data
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Nurse:
+        """
+        Create a new Nurse instance with the validated data.
+
+        Args:
+            validated_data (dict): The validated data.
+
+        Returns:
+            Nurse: The created Nurse instance.
+        """
         return Nurse.objects.create(**validated_data)
