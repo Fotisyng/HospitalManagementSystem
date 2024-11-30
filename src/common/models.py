@@ -3,6 +3,9 @@ from django.core.validators import RegexValidator
 
 
 class BasicInfo(models.Model):
+    """
+    A model for basic information for various entities of the application.
+    """
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),

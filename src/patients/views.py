@@ -1,3 +1,5 @@
+import logging
+
 from django.urls import reverse_lazy
 from doctors.models import Doctor
 from patients.models import Patient
@@ -8,9 +10,15 @@ from hospitalManagementSystem.views import BaseCreateView
 from common.utils import create_address_and_contact, prepare_model_data
 from django.shortcuts import redirect
 from config.url_names import PATIENT_LIST
+from config.constants import APP_LOGER
 
+logger = logging.getLogger(APP_LOGER)
 
 class PatientCreateView(BaseCreateView):
+    """
+    The view for the creation of a Patient.
+    """
+
     template_name = 'patient_form.html'
     success_message = 'Patient registered successfully!'
 
@@ -51,7 +59,6 @@ class PatientCreateView(BaseCreateView):
         serializer = PatientSerializer(data=patient_data)
 
         if serializer.is_valid():
-            print("Validation Passed: Data is valid.")
             patient = serializer.save()
             # Set supervised nurses if provided
             assigned_doctor = patient_data.get('doctors')
@@ -60,18 +67,20 @@ class PatientCreateView(BaseCreateView):
             else:
                 patient.doctors.clear()
 
-            print(f"Patient Created: {patient}")
+            logger.info(f"Patient created successfully: {patient}")
         else:
             # If validation fails, print errors
-            print("Validation Failed: Errors occurred.")
-            print(serializer.errors)
+            logger.error(f"Patient validation failed due to: {serializer.errors}")
             errors['patient'] = serializer.errors
-        print("The errors are:")
-        print(errors)
+        logger.error(f"Patient creation failed due to the following errors: {errors}")
         return errors
 
 
 class PatientListView(ListView):
+    """
+    The class view to show a list of all patients.
+    """
+
     model = Patient
     template_name = 'patient_list.html'  # The template to render the list
     context_object_name = 'patients'  # The name to access the list in the template
@@ -89,14 +98,22 @@ class PatientListView(ListView):
 
 
 class PatientDetailView(DetailView):
+    """
+    The class view to show a patient's detail information.
+    """
+
     model = Patient
     template_name = 'patient_detail.html'
     context_object_name = 'patient'  # The name to access the list in the template
 
 
 class PatientUpdateView(UpdateView):
+    """
+    The view to update a nurse's information.
+    """
+
     model = Patient
-    fields = '__all__'  # You can use '__all__' or specify specific fields.
+    fields = '__all__'
     template_name = 'patient_update_form.html'  # Path to the template
     success_url = reverse_lazy(PATIENT_LIST)  # Adjust the URL name as per your project
 
@@ -126,11 +143,15 @@ class PatientUpdateView(UpdateView):
         Args:
             form: The invalid form instance.
         """
-        print("Form is invalid!", form.errors)
+        logger.error(f"The update of the patient failed: {form.errors}")
         return super().form_invalid(form)
 
 
 class PatientDeleteView(DeleteView):
+    """
+    A class that handles the deletion of a Patient view.
+    """
+
     model = Patient
     template_name = 'patient_confirm_delete.html'  # Create this template for delete confirmation
-    success_url = reverse_lazy('patient-list')  # Redirect to list after successful deletion
+    success_url = reverse_lazy(PATIENT_LIST)  # Redirect to list after successful deletion

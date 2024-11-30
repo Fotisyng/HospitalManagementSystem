@@ -25,3 +25,5 @@ DEPARTMENT_CHOICES = [
     ('vascular_surgery', 'Vascular Surgery'),
     ('plastic_surgery', 'Plastic Surgery'),
 ]
+
+APP_LOGER = 'hospital_management_system_logger'

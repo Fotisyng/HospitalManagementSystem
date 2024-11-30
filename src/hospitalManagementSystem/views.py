@@ -1,8 +1,12 @@
+import logging
+
 from django.views import View
 from django.shortcuts import render
 from django.db import transaction
 from addresses.models import Country
+from config.constants import APP_LOGER
 
+logger = logging.getLogger(APP_LOGER)
 
 def render_form(request, template_name, context):
     """
@@ -19,7 +23,7 @@ def render_form(request, template_name, context):
     return render(request, template_name, context)
 
 
-def format_errors(errors):
+def format_errors(errors: dict)-> list:
     """
     Flattens and formats error messages for easier rendering.
 
@@ -48,10 +52,13 @@ class BaseCreateView(View):
     success_message = None  # To be defined by the subclass
 
     def get_context_data(self):
-        """Returns shared context data like countries."""
+        """
+        Returns shared context data like countries.
+        """
         countries = Country.objects.all().order_by('name')
         context = {
             'countries': countries,
+            'errors': [],
         }
         return context
 
@@ -70,7 +77,7 @@ class BaseCreateView(View):
         context = self.get_context_data()
         return render(request, self.template_name, context)
 
-    def create_related_models(self, data):
+    def create_related_models(self, data: dict) -> dict:
         """
         This method is intended to be overridden by subclasses to define specific
         model creation logic. It takes a dictionary of form data as input and is
@@ -129,12 +136,13 @@ class BaseCreateView(View):
                 return self.render_with_errors(request, context)
 
             # Success scenario
+            context['errors'] = []
             return self.render_with_success(request, context)
 
         except Exception as e:
             return self.handle_exception(request, e)
 
-    def handle_transaction(self, data):
+    def handle_transaction(self, data: dict)-> dict:
         """
         Handles the creation of related models within a transaction. It returns
         the validation errors that may occur within the transaction and in this case
@@ -155,7 +163,7 @@ class BaseCreateView(View):
                 transaction.set_rollback(True)
             return errors
 
-    def render_with_errors(self, request, context):
+    def render_with_errors(self, request, context: dict):
         """
         Renders the template with error messages.
 
@@ -166,16 +174,19 @@ class BaseCreateView(View):
         """
         return render(request, self.template_name, context)
 
-    def render_with_success(self, request, context):
-        """Renders the template with a success message."""
+    def render_with_success(self, request, context: dict):
+        """
+        Renders the template with a success message.
+        """
         context['success'] = self.success_message
         return render(request, self.template_name, context)
 
     def handle_exception(self, request, exception):
-        """Handles exceptions and renders the error message."""
+        """
+        Handles exceptions and renders the error message.
+        """
         import traceback
-        print(f"Exception occurred: {str(exception)}")
-        print(traceback.format_exc())
+        logger.error(f"Exception occurred: {str(exception)}\n{traceback.format_exc()}")
         context = self.get_context_data()
         context['errors'] = [str(exception)]
         return render(request, self.template_name, context)
