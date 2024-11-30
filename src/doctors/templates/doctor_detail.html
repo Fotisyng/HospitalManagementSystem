@@ -8,15 +8,48 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="card-title">{{ doctor.first_name }} {{ doctor.last_name }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{{ doctor.specialty }}</h6>
+            <h6 class="card-subtitle mb-2 text-muted">Specialty: {{ doctor.specialty }}</h6>
             <p class="card-text">
+                <strong>Date of Birth:</strong> {{ doctor.date_of_birth }}<br>
                 <strong>Email:</strong> {{ doctor.email }}<br>
                 <strong>Phone:</strong> {{ doctor.phone_number }}<br>
                 <strong>License Number:</strong> {{ doctor.license_number }}<br>
+                <strong>Date Hired:</strong> {{ doctor.date_hired }}<br>
+                <strong>End of Hiring Date:</strong> {% if doctor.hiring_end_date %}
+                {{ doctor.hiring_end_date }}
+                {% else %}
+                N/A
+                {% endif %}<br>
+
+                <strong>Address:</strong>
+                {% if doctor.address %}
+                {{ doctor.address.street_address }}, {{ doctor.address.city }},
+                {{ doctor.address.state }}, {{ doctor.address.postal_code }},
+                {{ doctor.address.country }}
+                {% else %}
+                Not Provided
+                {% endif %}<br>
+
+                <strong>Emergency Contact:</strong>
+                {% if doctor.emergency_contact %}
+                {{ doctor.emergency_contact.first_name }} {{ doctor.emergency_contact.last_name }} -
+                {{ doctor.emergency_contact.phone_number }}
+                {% else %}
+                Not Provided
+                {% endif %}<br>
+
+                <strong>Patients:</strong>
+            <ul>
+                {% for patient in doctor.patients.all %}
+                <li>{{ patient.first_name }} {{ patient.last_name }}</li>
+                {% empty %}
+                <li>No patients assigned.</li>
+                {% endfor %}
+            </ul>
             </p>
-            <a href="{% url 'doctor-update' doctor.pk %}" class="btn btn-warning">Edit Profile</a>
-            <a href="{% url 'doctor-delete' doctor.pk %}" class="btn btn-danger" onclick="return confirmDelete()">
-                Delete Profile</a>
+            <a href="{% url DOCTOR_UPDATE doctor.pk %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url DOCTOR_DELETE doctor.pk %}" class="btn btn-danger" onclick="return confirmDelete()">Delete
+                Profile</a>
         </div>
     </div>
 </div>

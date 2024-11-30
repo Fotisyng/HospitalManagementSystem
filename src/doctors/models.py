@@ -46,7 +46,7 @@ class Doctor(BasicInfo):
         related_name='doctor_contact'
     )
     license_number = models.CharField(max_length=100, unique=True)  # Unique license number for the doctor
-    patients = models.ManyToManyField(Patient, related_name='doctors')  # Many-to-many relationship
+    patients = models.ManyToManyField(Patient, related_name='doctors', blank=True)  # Many-to-many relationship
 
     def clean(self):
         super().clean()  # Call the base class's clean method first

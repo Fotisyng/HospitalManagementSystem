@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Nurses to Supervisor{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <h2 class="text-center mb-4 text-primary-color">Assign Nurses to Supervisor</h2>
+
+    <!-- Search bar for Supervisor Nurse -->
+    <div class="form-group search-input">
+        <label for="supervisor-nurse-search" class="search-label">Search Supervisor Nurse:</label>
+        <input type="text" id="supervisor-nurse-search" class="form-control" placeholder="Type to search supervisor nurse...">
+        <div id="supervisor-nurse-results" class="dropdown-results"></div>
+    </div>
+
+    <!-- Search bar for Nurse to Supervise -->
+    <div class="form-group search-input">
+        <label for="nurse-search" class="search-label">Search Nurse to Supervise:</label>
+        <input type="text" id="nurse-search" class="form-control" placeholder="Type to search nurse to supervise...">
+        <div id="nurse-results" class="dropdown-results"></div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary" id="assign-button">
+            Assign Selected Nurse
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'js/supervisor_nurse_search.js' %}"></script>
+<script src="{% static 'js/nurse_search.js' %}"></script>
+<script src="{% static 'js/assign_nurse.js' %}"></script>
+{% endblock %}

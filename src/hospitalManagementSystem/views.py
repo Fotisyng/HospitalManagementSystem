@@ -3,6 +3,46 @@ from django.shortcuts import render
 from django.db import transaction
 from addresses.models import Country
 
+
+def render_form(request, template_name, context):
+    """
+    Renders a form with the given template name and context.
+
+    Parameters:
+    request (HttpRequest): The HTTP request object.
+    template_name (str): The name of the template to render.
+    context (dict): The context data to pass to the template.
+
+    Returns:
+    HttpResponse: The rendered template with the given context data.
+    """
+    return render(request, template_name, context)
+
+
+def format_errors(errors):
+    """
+    Flattens and formats error messages for easier rendering.
+
+    Parameters:
+    errors (dict): A dictionary containing model keys as keys and field errors as values.
+    Each field error is a dictionary with field names as keys and error messages as values.
+    Error messages can be either a string or a list of strings.
+
+    Returns:
+    list: A list of formatted error messages. Each error message is a string.
+    """
+    formatted_errors = []
+    for model_key, field_errors in errors.items():
+        for field, error_list in field_errors.items():
+            for error in error_list:
+                if isinstance(error, list) or isinstance(error, str):
+                    clean_error = error.strip("[]'\"")
+                    formatted_errors.append(clean_error)
+                else:
+                    formatted_errors.append(str(error))
+    return formatted_errors
+
+
 class BaseCreateView(View):
     template_name = None  # To be defined by the subclass
     success_message = None  # To be defined by the subclass
@@ -84,7 +124,7 @@ class BaseCreateView(View):
             context = self.get_context_data()
 
             if errors:
-                formatted_errors = self.format_errors(errors)
+                formatted_errors = format_errors(errors)
                 context['errors'] = formatted_errors
                 return self.render_with_errors(request, context)
 
@@ -99,6 +139,15 @@ class BaseCreateView(View):
         Handles the creation of related models within a transaction. It returns
         the validation errors that may occur within the transaction and in this case
         it is rolled back.
+
+        Parameters:
+            data (dict): A dictionary containing form data. The keys represent field names,
+            and the values represent the corresponding field values.
+
+        Returns:
+            dict: A dictionary of validation errors. The keys represent model names, and
+            the values are dictionaries containing field names as keys and error
+            messages as values. If no errors occur, an empty dictionary is returned.
         """
         with transaction.atomic():
             errors = self.create_related_models(data)
@@ -106,31 +155,15 @@ class BaseCreateView(View):
                 transaction.set_rollback(True)
             return errors
 
-    def format_errors(self, errors):
+    def render_with_errors(self, request, context):
         """
-        Flattens and formats error messages for easier rendering.
+        Renders the template with error messages.
 
         Parameters:
-        errors (dict): A dictionary containing model keys as keys and field errors as values.
-        Each field error is a dictionary with field names as keys and error messages as values.
-        Error messages can be either a string or a list of strings.
+            request (HttpRequest): The incoming request object.
+            context (dict): The context data to pass to the template.
 
-        Returns:
-        list: A list of formatted error messages. Each error message is a string.
         """
-        formatted_errors = []
-        for model_key, field_errors in errors.items():
-            for field, error_list in field_errors.items():
-                for error in error_list:
-                    if isinstance(error, list) or isinstance(error, str):
-                        clean_error = error.strip("[]'\"")
-                        formatted_errors.append(clean_error)
-                    else:
-                        formatted_errors.append(str(error))
-        return formatted_errors
-
-    def render_with_errors(self, request, context):
-        """Renders the template with error messages."""
         return render(request, self.template_name, context)
 
     def render_with_success(self, request, context):
@@ -146,6 +179,3 @@ class BaseCreateView(View):
         context = self.get_context_data()
         context['errors'] = [str(exception)]
         return render(request, self.template_name, context)
-
-    def render_form(self, request, template_name, context):
-        return render(request, template_name, context)

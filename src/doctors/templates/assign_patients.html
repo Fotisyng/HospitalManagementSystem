@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Doctors to Patients{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <h2 class="text-center mb-4 text-primary-color">Assign Patients to Doctor</h2>
+
+    <!-- Search bar for Doctor -->
+    <div class="form-group search-input">
+        <label for="doctor-search" class="search-label">Search Doctor:</label>
+        <input type="text" id="doctor-search" class="form-control" placeholder="Type to search doctor...">
+        <div id="doctor-results" class="dropdown-results"></div>
+    </div>
+
+    <!-- Search bar for Patient -->
+    <div class="form-group search-input">
+        <label for="patient-search" class="search-label">Search Patient:</label>
+        <input type="text" id="patient-search" class="form-control" placeholder="Type to search patient...">
+        <div id="patient-results" class="dropdown-results"></div>
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary" id="assign-button">
+            Assign Selected Patient
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/search.js' %}"></script>
+<script src="{% static 'js/doctor_search.js' %}"></script>
+<script src="{% static 'js/patient_search.js' %}"></script>
+<script src="{% static 'js/assign_patients.js' %}"></script>
+{% endblock %}

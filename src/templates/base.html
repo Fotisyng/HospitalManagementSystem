@@ -42,8 +42,9 @@
                         Doctors
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="doctorDropdown">
-                        <li><a class="dropdown-item" href="{% url 'create-doctor' %}">Create Doctor</a></li>
-                        <li><a class="dropdown-item" href="{% url 'doctor-list' %}">List Doctors</a></li>
+                        <li><a class="dropdown-item" href="{% url DOCTOR_CREATE %}">Create Doctor</a></li>
+                        <li><a class="dropdown-item" href="{% url DOCTOR_LIST %}">List Doctors</a></li>
+                        <li><a class="dropdown-item" href="{% url ASSIGN_PATIENT %}">Assign Patient</a></li>
                     </ul>
                 </li>
 
@@ -54,8 +55,8 @@
                         Patients
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="patientDropdown">
-                        <li><a class="dropdown-item" href="{% url 'create_patient' %}">Register Patient</a></li>
-                        <li><a class="dropdown-item" href="{% url 'patient-list' %}">List Patients</a></li>
+                        <li><a class="dropdown-item" href="{% url PATIENT_CREATE %}">Register Patient</a></li>
+                        <li><a class="dropdown-item" href="{% url PATIENT_LIST %}">List Patients</a></li>
                     </ul>
                 </li>
 
@@ -66,8 +67,9 @@
                         Nurses
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="nurseDropdown">
-                        <li><a class="dropdown-item" href="{% url 'create_nurse' %}">Register Nurse</a></li>
-                        <li><a class="dropdown-item" href="{% url 'nurse-list' %}">List Nurses</a></li>
+                        <li><a class="dropdown-item" href="{% url NURSE_CREATE %}">Register Nurse</a></li>
+                        <li><a class="dropdown-item" href="{% url NURSE_LIST %}">List Nurses</a></li>
+                        <li><a class="dropdown-item" href="{% url NURSE_ASSIGN %}">Assign Supervisor Nurse</a></li>
                     </ul>
                 </li>
             </ul>

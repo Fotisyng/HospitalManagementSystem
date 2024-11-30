@@ -1,0 +1,32 @@
+/* Custom styles for navbar */
+.navbar {
+    background-color: #2c3e54; /* Darker color to match dropdown */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+.navbar-brand {
+    color: #468590 !important; /* Custom brand color */
+    font-weight: bold; /* Bold font */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+.navbar-brand:hover {
+    color: #fff !important; /* Change color on hover */
+}
+.nav-link {
+    color: #a8b4b2 !important; /* Custom nav link color */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+.nav-link:hover {
+    color: #468590 !important; /* Change color on hover */
+    text-decoration: underline; /* Underline effect on hover */
+}
+.dropdown-menu {
+    background-color: #2c3e54; /* Darker dropdown background */
+}
+.dropdown-item {
+    color: #a8b4b2 !important; /* Dropdown item color */
+    transition: background-color 0.3s ease; /* Smooth background transition */
+}
+.dropdown-item:hover {
+    background-color: #468590; /* Change background on hover */
+    color: #fff !important; /* Change text color on hover */
+}

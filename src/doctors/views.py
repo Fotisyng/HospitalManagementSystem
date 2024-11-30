@@ -1,12 +1,11 @@
 from .models import Doctor
 from .serializers import DoctorSerializer
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, View
 from django.urls import reverse_lazy
 from hospitalManagementSystem.views import BaseCreateView
-from common.utils import create_address, create_emergency_contact
-from django.core.exceptions import ValidationError as DjangoValidationError
-
-
+from common.utils import create_address_and_contact, prepare_model_data
+from config.url_names import DOCTOR_LIST, DOCTOR_DETAIL
+from django.shortcuts import redirect, render
 
 class DoctorCreateFormView(BaseCreateView):
     template_name = 'doctor_form.html'
@@ -28,82 +27,10 @@ class DoctorCreateFormView(BaseCreateView):
     def create_related_models(self, data):
         """Handles doctor-specific related model creation. The doctor address and
         emergency_contact are also created along with the doctor object."""
-        errors = {}
-        address = None
-        try:
-            if all(data.get(field) for field in ['country', 'city', 'postal_code']):
-                address_data = {
-                    'country': data.get('country'),
-                    'city': data.get('city'),
-                    'state': data.get('state'),
-                    'postal_code': data.get('postal_code'),
-                    'street_address': data.get('street_address'),
-                }
-                address = create_address(address_data)
-            else:
-                address = None
-        except DjangoValidationError as e:
-            errors['address'] = {
-                'messages': [str(error) for error in e.error_list]}  # or str(e) if you prefer a string format
-        # Create Address for the emergency contact
-        emergency_contact_address = None
-        try:
-            if all(data.get(field, '').strip() for field in
-                   ['emergency_contact_country', 'emergency_contact_city', 'emergency_contact_postal_code']):
-                emergency_contact_address_data = {
-                    'country': data.get('emergency_contact_country'),
-                    'city': data.get('emergency_contact_city'),
-                    'state': data.get('emergency_contact_state'),
-                    'postal_code': data.get('emergency_contact_postal_code'),
-                    'street_address': data.get('emergency_contact_street_address'),
-                }
-                emergency_contact_address = create_address(emergency_contact_address_data)
-            else:
-                emergency_contact_address = None
-        except DjangoValidationError as e:
-            # If emergency contact address validation fails, store the error
-            errors['emergency_contact_address'] = {'messages': [str(error) for error in e.error_list]}
-
-        # Create Emergency Contact
-        emergency_contact = None
-        if all(data.get(field, '').strip() for field in
-               ['emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_phone_number',
-                'emergency_contact_relationship', 'emergency_contact_secondary_phone_number',
-                'emergency_contact_date_of_birth', 'emergency_contact_gender', 'emergency_contact_email']):
-            emergency_contact_data = {
-                'first_name': data.get('emergency_contact_first_name'),
-                'last_name': data.get('emergency_contact_last_name'),
-                'email': data.get('emergency_contact_email'),
-                'date_of_birth': data.get('emergency_contact_date_of_birth'),
-                'gender': data.get('emergency_contact_gender'),
-                'phone_number': data.get('emergency_contact_phone_number'),
-                'secondary_phone_number': data.get('emergency_contact_secondary_phone_number'),
-                'relationship': data.get('emergency_contact_relationship'),
-            }
-            try:
-                emergency_contact = create_emergency_contact(emergency_contact_data, emergency_contact_address)
-            except DjangoValidationError as e:
-                # If emergency contact validation fails, store the error
-                errors['emergency_contact'] = {'messages': [str(error) for error in e.error_list]}
-
-        print({emergency_contact})
+        address, emergency_contact, errors = create_address_and_contact(data)
 
         # Extract doctor data
-        doctor_data = {
-            'first_name': data.get('first_name'),
-            'last_name': data.get('last_name'),
-            'phone_number': data.get('phone_number'),
-            'email': data.get('email'),
-            'date_of_birth': data.get('date_of_birth'),
-            'gender': data.get('gender'),
-            'specialty': data.get('specialty'),
-            'date_hired': data.get('date_hired'),
-            'hiring_end_date': data.get('hiring_end_date') if data.get('hiring_end_date') else None,
-            'license_number': data.get('license_number'),
-            'address': address.pk if address else None,
-            'emergency_contact': emergency_contact.pk if emergency_contact else None,
-        }
-        print(doctor_data)
+        doctor_data = prepare_model_data(data, 'doctor', address, emergency_contact)
         serializer = DoctorSerializer(data=doctor_data)
 
         if serializer.is_valid():
@@ -134,12 +61,58 @@ class DoctorDetailView(DetailView):
 
 class DoctorUpdateView(UpdateView):
     model = Doctor
-    fields = ['first_name', 'last_name', 'specialty', 'phone_number', 'email', 'license_number']  # Add other fields as needed
+    fields = '__all__'
     template_name = 'doctor_update_form.html'
-    success_url = '/doctors/list'  # Redirect to the doctor list or detail after successful update
+    success_url = reverse_lazy(DOCTOR_LIST)
+
+    def form_valid(self, form):
+        """
+        Perform the update operation on the specified doctor and update
+        the 'patients' field if included in POST data.
+
+        Note: The 'patients' field is not updated directly in this view,
+        but rather in the form_valid method. This is done to avoid clearing
+        the 'patients' field during the update operation.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the updated data.
+        """
+        doctor = form.save(commit=False)
+        doctor.save()
+
+        # Handle 'patients' field separately if it's included in POST data
+        if 'patients' in self.request.POST:
+            patients = form.cleaned_data.get('patients')
+            doctor.patients.set(patients)
+
+        return redirect(DOCTOR_LIST)
+
+    def form_invalid(self, form):
+        """
+        Handle the invalid form submission.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the invalid data.
+        """
+        print("Form is invalid!", form.errors)
+        return super().form_invalid(form)
 
 
 class DoctorDeleteView(DeleteView):
     model = Doctor
-    template_name = 'doctor_confirm_delete.html'  # Create this template for delete confirmation
-    success_url = reverse_lazy('doctor-list')  # Redirect to doctor list after successful deletion
+    template_name = 'doctor_confirm_delete.html'
+    success_url = reverse_lazy(DOCTOR_LIST)
+
+
+class AssignPatientsView(View):
+    def get(self, request):
+        """
+        Display the form to assign patients to a doctor.
+
+        Args:
+            request (django.http.HttpRequest): The HTTP request object.
+
+        Returns:
+            django.http.HttpResponse: The rendered HTML template with the form.
+        """
+        return render(request, 'assign_patients.html')

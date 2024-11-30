@@ -1,10 +1,11 @@
-from django.views.generic import ListView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, UpdateView, DeleteView, DetailView, View
 from django.urls import reverse_lazy
 from .models import Nurse
 from .serializers import NurseSerializer
 from hospitalManagementSystem.views import BaseCreateView
-from common.utils import create_address, create_emergency_contact
-from django.core.exceptions import ValidationError as DjangoValidationError
+from common.utils import create_address_and_contact, prepare_model_data
+from django.shortcuts import redirect, render
+from config.url_names import NURSE_LIST
 
 
 class NurseCreateView(BaseCreateView):
@@ -31,83 +32,9 @@ class NurseCreateView(BaseCreateView):
     def create_related_models(self, data):
         """Handles nurse-specific related model creation. The nurse address and
         emergency_contact are also created along with the nurse object."""
-        errors = {}
-        address = None
-        try:
-            if all(data.get(field) for field in ['country', 'city', 'postal_code']):
-                address_data = {
-                    'country': data.get('country'),
-                    'city': data.get('city'),
-                    'state': data.get('state'),
-                    'postal_code': data.get('postal_code'),
-                    'street_address': data.get('street_address'),
-                }
-                address = create_address(address_data)
-            else:
-                address = None
-        except DjangoValidationError as e:
-            errors['address'] = {
-                'messages': [str(error) for error in e.error_list]}  # or str(e) if you prefer a string format
-        # Create Address for the emergency contact
-        emergency_contact_address = None
-        try:
-            if all(data.get(field, '').strip() for field in
-                   ['emergency_contact_country', 'emergency_contact_city', 'emergency_contact_postal_code']):
-                emergency_contact_address_data = {
-                    'country': data.get('emergency_contact_country'),
-                    'city': data.get('emergency_contact_city'),
-                    'state': data.get('emergency_contact_state'),
-                    'postal_code': data.get('emergency_contact_postal_code'),
-                    'street_address': data.get('emergency_contact_street_address'),
-                }
-                emergency_contact_address = create_address(emergency_contact_address_data)
-            else:
-                emergency_contact_address = None
-        except DjangoValidationError as e:
-            # If emergency contact address validation fails, store the error
-            errors['emergency_contact_address'] = {'messages': [str(error) for error in e.error_list]}
+        address, emergency_contact, errors = create_address_and_contact(data)
 
-        # Create Emergency Contact
-        emergency_contact = None
-        if all(data.get(field, '').strip() for field in
-               ['emergency_contact_first_name', 'emergency_contact_last_name', 'emergency_contact_phone_number',
-                'emergency_contact_relationship', 'emergency_contact_secondary_phone_number',
-                'emergency_contact_date_of_birth', 'emergency_contact_gender', 'emergency_contact_email']):
-            emergency_contact_data = {
-                'first_name': data.get('emergency_contact_first_name'),
-                'last_name': data.get('emergency_contact_last_name'),
-                'email': data.get('emergency_contact_email'),
-                'date_of_birth': data.get('emergency_contact_date_of_birth'),
-                'gender': data.get('emergency_contact_gender'),
-                'phone_number': data.get('emergency_contact_phone_number'),
-                'secondary_phone_number': data.get('emergency_contact_secondary_phone_number'),
-                'relationship': data.get('emergency_contact_relationship'),
-            }
-            try:
-                emergency_contact = create_emergency_contact(emergency_contact_data, emergency_contact_address)
-            except DjangoValidationError as e:
-                # If emergency contact validation fails, store the error
-                errors['emergency_contact'] = {'messages': [str(error) for error in e.error_list]}
-
-        print({emergency_contact})
-
-        nurse_data = {
-            'first_name': data.get('first_name'),
-            'last_name': data.get('last_name'),
-            'date_of_birth': data.get('date_of_birth'),
-            'phone_number': data.get('phone_number'),
-            'email': data.get('email'),
-            'gender': data.get('gender'),
-            'license_number': data.get('license_number'),
-            'role': data.get('role'),
-            'department': data.get('department'),
-            'date_hired': data.get('date_hired'),
-            'hiring_end_date': data.get('hiring_end_date') if data.get('hiring_end_date') else None,
-            'supervisor_nurse': data.getlist('supervisor_nurse'),
-            'address': address.pk if address else None,
-            'emergency_contact': emergency_contact.pk if emergency_contact else None,
-        }
-        print(nurse_data)
+        nurse_data = prepare_model_data(data, 'nurse', address, emergency_contact)
         serializer = NurseSerializer(data=nurse_data)
 
         if serializer.is_valid():
@@ -133,24 +60,78 @@ class NurseCreateView(BaseCreateView):
 
 class NurseListView(ListView):
     model = Nurse
-    template_name = 'nurse_list.html'  # Create this template
-    context_object_name = 'nurses'  # The name to access the list in the template
+    template_name = 'nurse_list.html'
+    context_object_name = 'nurses'
 
 
 class NurseDetailView(DetailView):
+    """
+    Show a nurse's details view. This view displays information about the specified nurse.
+    """
     model = Nurse
     template_name = 'nurse_detail.html'
-    context_object_name = 'nurse'  # The name to access the list in the template
+    context_object_name = 'nurse'
 
 
 class NurseUpdateView(UpdateView):
+    """
+    Update a nurse's information.
+    If the supervisor_nurses field is included in POST data, it will be updated
+    along with the rest of the form data.
+    """
     model = Nurse
-    fields = '__all__'  # All fields will be editable
-    template_name = 'nurse_update_form.html'  # The template to render the form
-    success_url = reverse_lazy('nurse-list')  # Redirect to the list after successful update
+    fields = '__all__'
+    template_name = 'nurse_update_form.html'
+    success_url = reverse_lazy(NURSE_LIST)
+
+    def form_valid(self, form):
+        """
+        Perform the update operation on the specified nurse and update
+        the 'supervisor_nurses' field if included in POST data. This is in order
+        not to overwrite existing fields.
+
+        Args:
+            form (forms.ModelForm): The form instance containing the updated data.
+        """
+        nurse = form.save(commit=False)
+        nurse.save()
+
+        # Handle 'supervisor_nurses' field separately if included in POST data
+        if 'supervisor_nurses' in self.request.POST:
+            supervisor_nurses = form.cleaned_data.get('supervisor_nurses')
+            nurse.supervisor_nurses.set(supervisor_nurses)
+
+        return redirect(self.success_url)
+
+    def form_invalid(self, form):
+        """
+        Handle the invalid form submission.
+
+        Args:
+            form: The invalid form instance.
+        """
+        print("Form is invalid!", form.errors)
+        return super().form_invalid(form)
 
 
 class NurseDeleteView(DeleteView):
     model = Nurse
     template_name = 'nurse_confirm_delete.html'  # Create this template for delete confirmation
     success_url = reverse_lazy('nurse-list')  # Redirect to list after successful deletion
+
+
+class AssignNursesView(View):
+    """
+    A class that handles the view to assign nurses to a supervising nurse.
+    """
+    def get(self, request):
+        """
+        Display the form to assign nurses to a supervising nurse.
+
+        Args:
+            request (django.http.HttpRequest): The HTTP request object.
+
+        Returns:
+            django.http.HttpResponse: The rendered HTML template with the form.
+        """
+        return render(request, 'nurse_assign.html')
