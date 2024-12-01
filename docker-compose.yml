@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d  # Mount initialization scripts
+
+    ports:
+      - "3307:3306"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  core_service:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - app-network
+    command: >
+      sh -c "
+      cd /app/src &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

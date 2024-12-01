@@ -8,10 +8,10 @@ class Migration(migrations.Migration):
         ('nurses', '0005_rename_supervised_nurses_nurse_supervisor_nurses'),
     ]
     operations = [
-        migrations.AddField(
-            model_name='nurse',
-            name='hiring_end_date',
-            field=models.DateField(null=True, blank=True),
-            preserve_default=False,
-        ),
+        # migrations.AddField(
+        #     model_name='nurse',
+        #     name='hiring_end_date',
+        #     field=models.DateField(null=True, blank=True),
+        #     preserve_default=False,
+        # ),
     ]
